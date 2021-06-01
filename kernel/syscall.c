@@ -7,7 +7,7 @@
 #include "syscall.h"
 #include "defs.h"
 
-// Fetch the uint64 at addr from the current process.
+// 从当前进程获取addr处的uint64。
 int
 fetchaddr(uint64 addr, uint64 *ip)
 {
@@ -19,8 +19,8 @@ fetchaddr(uint64 addr, uint64 *ip)
   return 0;
 }
 
-// Fetch the nul-terminated string at addr from the current process.
-// Returns length of string, not including nul, or -1 for error.
+// 从当前进程中获取addr处以nul结尾的字符串。
+// 返回字符串长度，不包括nul，或返回-1作为错误。
 int
 fetchstr(uint64 addr, char *buf, int max)
 {
@@ -53,7 +53,7 @@ argraw(int n)
   return -1;
 }
 
-// Fetch the nth 32-bit system call argument.
+// 获取第n个32位系统调用参数。
 int
 argint(int n, int *ip)
 {
@@ -61,9 +61,8 @@ argint(int n, int *ip)
   return 0;
 }
 
-// Retrieve an argument as a pointer.
-// Doesn't check for legality, since
-// copyin/copyout will do that.
+// 将参数作为指针检索。
+// 不检查合法性，因为copyin/copyout会这样做。
 int
 argaddr(int n, uint64 *ip)
 {
@@ -71,9 +70,9 @@ argaddr(int n, uint64 *ip)
   return 0;
 }
 
-// Fetch the nth word-sized system call argument as a null-terminated string.
-// Copies into buf, at most max.
-// Returns string length if OK (including nul), -1 if error.
+// 将第n个字大小的系统调用参数作为以null结尾的字符串获取。
+// 拷贝到buf，最多max个字节
+// 如果是OK（包括nul），则返回字符串长度；如果是错误，则返回-1。
 int
 argstr(int n, char *buf, int max)
 {
