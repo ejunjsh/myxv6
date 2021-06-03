@@ -1,13 +1,13 @@
-#define NPROC        64  // maximum number of processes
-#define NCPU          8  // maximum number of CPUs
-#define NOFILE       16  // open files per process
-#define NFILE       100  // open files per system
-#define NINODE       50  // maximum number of active i-nodes
-#define NDEV         10  // maximum major device number
-#define ROOTDEV       1  // device number of file system root disk
-#define MAXARG       32  // max exec arguments
-#define MAXOPBLOCKS  10  // max # of blocks any FS op writes
-#define LOGSIZE      (MAXOPBLOCKS*3)  // max data blocks in on-disk log
-#define NBUF         (MAXOPBLOCKS*3)  // size of disk block cache
-#define FSSIZE       1000  // size of file system in blocks
-#define MAXPATH      128   // maximum file path name
+#define NPROC        64  // 最大进程数
+#define NCPU          8  // 最大CPU数
+#define NOFILE       16  // 每个进程打开文件
+#define NFILE       100  // 每个系统打开的文件
+#define NINODE       50  // 活动i-node的最大数目
+#define NDEV         10  // 最大主设备编号
+#define ROOTDEV       1  // 文件系统根磁盘的设备号
+#define MAXARG       32  // 最大exec参数数
+#define MAXOPBLOCKS  10  // 任何文件系统操作写入的最大块数
+#define LOGSIZE      (MAXOPBLOCKS*3)  // 磁盘日志中的最大数据块
+#define NBUF         (MAXOPBLOCKS*3)  // 磁盘块缓存大小
+#define FSSIZE       1000  // 文件系统的大小（以块为单位）
+#define MAXPATH      128   // 最大文件路径名
