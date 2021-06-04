@@ -1,10 +1,10 @@
-// Format of an ELF executable file
+// ELF可执行文件的格式
 
-#define ELF_MAGIC 0x464C457FU  // "\x7FELF" in little endian
+#define ELF_MAGIC 0x464C457FU  // "\x7FELF" 的小端
 
-// File header
+// 文件头
 struct elfhdr {
-  uint magic;  // must equal ELF_MAGIC
+  uint magic;  // 必须等于ELF_MAGIC
   uchar elf[12];
   ushort type;
   ushort machine;
@@ -21,7 +21,7 @@ struct elfhdr {
   ushort shstrndx;
 };
 
-// Program section header
+// 程序段头
 struct proghdr {
   uint32 type;
   uint32 flags;
@@ -33,10 +33,10 @@ struct proghdr {
   uint64 align;
 };
 
-// Values for Proghdr type
+// Proghdr类型的值
 #define ELF_PROG_LOAD           1
 
-// Flag bits for Proghdr flags
+// Proghdr标志的标志位
 #define ELF_PROG_FLAG_EXEC      1
 #define ELF_PROG_FLAG_WRITE     2
 #define ELF_PROG_FLAG_READ      4
