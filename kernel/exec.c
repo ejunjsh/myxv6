@@ -29,7 +29,7 @@ exec(char *path, char **argv)
   }
   ilock(ip);
 
-  // Check ELF header
+  // 检查ELF头
   if(readi(ip, 0, (uint64)&elf, 0, sizeof(elf)) != sizeof(elf))
     goto bad;
   if(elf.magic != ELF_MAGIC)
@@ -38,7 +38,7 @@ exec(char *path, char **argv)
   if((pagetable = proc_pagetable(p)) == 0)
     goto bad;
 
-  // Load program into memory.
+  // 将程序加载到内存中。
   for(i=0, off=elf.phoff; i<elf.phnum; i++, off+=sizeof(ph)){
     if(readi(ip, 0, (uint64)&ph, off, sizeof(ph)) != sizeof(ph))
       goto bad;
@@ -64,8 +64,8 @@ exec(char *path, char **argv)
   p = myproc();
   uint64 oldsz = p->sz;
 
-  // Allocate two pages at the next page boundary.
-  // Use the second as the user stack.
+  // 在下一页边界处分配两页。
+  // 使用第二个作为用户堆栈。
   sz = PGROUNDUP(sz);
   uint64 sz1;
   if((sz1 = uvmalloc(pagetable, sz, sz + 2*PGSIZE)) == 0)
@@ -75,12 +75,12 @@ exec(char *path, char **argv)
   sp = sz;
   stackbase = sp - PGSIZE;
 
-  // Push argument strings, prepare rest of stack in ustack.
+  // 压入参数字符串，准备ustack中堆栈的其余部分。
   for(argc = 0; argv[argc]; argc++) {
     if(argc >= MAXARG)
       goto bad;
     sp -= strlen(argv[argc]) + 1;
-    sp -= sp % 16; // riscv sp must be 16-byte aligned
+    sp -= sp % 16; // riscv sp必须16字节对齐
     if(sp < stackbase)
       goto bad;
     if(copyout(pagetable, sp, argv[argc], strlen(argv[argc]) + 1) < 0)
@@ -89,7 +89,7 @@ exec(char *path, char **argv)
   }
   ustack[argc] = 0;
 
-  // push the array of argv[] pointers.
+  // 压入argv[]指针数组
   sp -= (argc+1) * sizeof(uint64);
   sp -= sp % 16;
   if(sp < stackbase)
@@ -97,26 +97,25 @@ exec(char *path, char **argv)
   if(copyout(pagetable, sp, (char *)ustack, (argc+1)*sizeof(uint64)) < 0)
     goto bad;
 
-  // arguments to user main(argc, argv)
-  // argc is returned via the system call return
-  // value, which goes in a0.
+  // 用户main(argc, argv)的argv 参数放入a1
+  // argc通过系统调用返回值返回，通过a0
   p->trapframe->a1 = sp;
 
-  // Save program name for debugging.
+  // 保存程序名字方便调试
   for(last=s=path; *s; s++)
     if(*s == '/')
       last = s+1;
   safestrcpy(p->name, last, sizeof(p->name));
     
-  // Commit to the user image.
+  // 提交到用户映像。
   oldpagetable = p->pagetable;
   p->pagetable = pagetable;
   p->sz = sz;
-  p->trapframe->epc = elf.entry;  // initial program counter = main
-  p->trapframe->sp = sp; // initial stack pointer
+  p->trapframe->epc = elf.entry;  // 初始程序计数器 = main
+  p->trapframe->sp = sp; // 初始堆栈指针
   proc_freepagetable(oldpagetable, oldsz);
 
-  return argc; // this ends up in a0, the first argument to main(argc, argv)
+  return argc; // 结果是a0，main(argc, argv)的第一个参数
 
  bad:
   if(pagetable)
@@ -128,10 +127,10 @@ exec(char *path, char **argv)
   return -1;
 }
 
-// Load a program segment into pagetable at virtual address va.
-// va must be page-aligned
-// and the pages from va to va+sz must already be mapped.
-// Returns 0 on success, -1 on failure.
+// 将程序段加载到虚拟地址va处的pagetable中。
+// va必须页对齐
+// 从va到va+sz的页面必须已经被映射。
+// 成功时返回0，失败时返回-1。
 static int
 loadseg(pagetable_t pagetable, uint64 va, struct inode *ip, uint offset, uint sz)
 {
