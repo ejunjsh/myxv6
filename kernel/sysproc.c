@@ -14,7 +14,7 @@ sys_exit(void)
   if(argint(0, &n) < 0)
     return -1;
   exit(n);
-  return 0;  // not reached
+  return 0;  // 不会到这里
 }
 
 uint64
@@ -83,8 +83,7 @@ sys_kill(void)
   return kill(pid);
 }
 
-// return how many clock tick interrupts have occurred
-// since start.
+// 返回自启动以来发生的时钟滴答中断数。
 uint64
 sys_uptime(void)
 {
