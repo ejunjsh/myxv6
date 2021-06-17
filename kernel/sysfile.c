@@ -1,7 +1,7 @@
 //
-// File-system system calls.
-// Mostly argument checking, since we don't trust
-// user code, and calls into file.c and fs.c.
+// 文件系统相关系统调用。
+// 因为我们不信任用户代码，所以主要是参数检查。
+// 主要调用file.c和fs.c里的函数。
 //
 
 #include "types.h"
@@ -16,8 +16,8 @@
 #include "file.h"
 #include "fcntl.h"
 
-// Fetch the nth word-sized system call argument as a file descriptor
-// and return both the descriptor and the corresponding struct file.
+// 获取第n个字大小的系统调用参数作为文件描述符
+// 并返回描述符和相应的结构文件。
 static int
 argfd(int n, int *pfd, struct file **pf)
 {
@@ -35,8 +35,8 @@ argfd(int n, int *pfd, struct file **pf)
   return 0;
 }
 
-// Allocate a file descriptor for the given file.
-// Takes over file reference from caller on success.
+// 为给定的文件分配一个文件描述符。
+// 成功时从调用方接收文件引用。
 static int
 fdalloc(struct file *f)
 {
@@ -108,14 +108,14 @@ uint64
 sys_fstat(void)
 {
   struct file *f;
-  uint64 st; // user pointer to struct stat
+  uint64 st; // 指向struct stat的用户指针
 
   if(argfd(0, 0, &f) < 0 || argaddr(1, &st) < 0)
     return -1;
   return filestat(f, st);
 }
 
-// Create the path new as a link to the same inode as old.
+// 创建路径new作为指向与old相同inode的链接。
 uint64
 sys_link(void)
 {
@@ -165,7 +165,7 @@ bad:
   return -1;
 }
 
-// Is the directory dp empty except for "." and ".." ?
+// 目录dp除了“.”和“.”是空的吗？
 static int
 isdirempty(struct inode *dp)
 {
@@ -267,10 +267,10 @@ create(char *path, short type, short major, short minor)
   ip->nlink = 1;
   iupdate(ip);
 
-  if(type == T_DIR){  // Create . and .. entries.
-    dp->nlink++;  // for ".."
+  if(type == T_DIR){  // 创建 . 和 ..
+    dp->nlink++;  // 对于 ".."
     iupdate(dp);
-    // No ip->nlink++ for ".": avoid cyclic ref count.
+    // “.”没有ip->nlink++：避免循环引用计数。
     if(dirlink(ip, ".", ip->inum) < 0 || dirlink(ip, "..", dp->inum) < 0)
       panic("create dots");
   }
@@ -457,7 +457,7 @@ sys_exec(void)
 uint64
 sys_pipe(void)
 {
-  uint64 fdarray; // user pointer to array of two integers
+  uint64 fdarray; // 用户指向一个数组的指针，数组有两个描述符整数
   struct file *rf, *wf;
   int fd0, fd1;
   struct proc *p = myproc();
