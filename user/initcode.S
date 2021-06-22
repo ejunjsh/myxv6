@@ -1,5 +1,5 @@
-# Initial process that execs /init.
-# This code runs in user space.
+# 初始进程，它执行/init
+# 这个代码运行在用户空间
 
 #include "syscall.h"
 
