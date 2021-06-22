@@ -1,4 +1,4 @@
-// Simple grep.  Only supports ^ . * $ operators.
+// 简单 grep.  只支持 ^ . * $ 操作.
 
 #include "kernel/types.h"
 #include "kernel/stat.h"
@@ -61,8 +61,8 @@ main(int argc, char *argv[])
   exit(0);
 }
 
-// Regexp matcher from Kernighan & Pike,
-// The Practice of Programming, Chapter 9.
+// Kernighan&Pike的正则匹配，
+// 编程实践，第9章。
 
 int matchhere(char*, char*);
 int matchstar(int, char*, char*);
@@ -72,14 +72,14 @@ match(char *re, char *text)
 {
   if(re[0] == '^')
     return matchhere(re+1, text);
-  do{  // must look at empty string
+  do{  // 必须查看空字符串
     if(matchhere(re, text))
       return 1;
   }while(*text++ != '\0');
   return 0;
 }
 
-// matchhere: search for re at beginning of text
+// matchhere: 在文本text开头搜索re
 int matchhere(char *re, char *text)
 {
   if(re[0] == '\0')
@@ -93,10 +93,10 @@ int matchhere(char *re, char *text)
   return 0;
 }
 
-// matchstar: search for c*re at beginning of text
+// matchstar: 在文本text开头搜索c*re
 int matchstar(int c, char *re, char *text)
 {
-  do{  // a * matches zero or more instances
+  do{  // 一个*匹配零个或多个实例
     if(matchhere(re, text))
       return 1;
   }while(*text!='\0' && (*text++==c || c=='.'));
