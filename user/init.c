@@ -1,4 +1,4 @@
-// init: The initial user-level program
+// init: 初始用户级程序
 
 #include "kernel/types.h"
 #include "kernel/stat.h"
@@ -37,17 +37,17 @@ main(void)
     }
 
     for(;;){
-      // this call to wait() returns if the shell exits,
-      // or if a parentless process exits.
+      // 如果shell退出，则调用wait()返回，
+      // 或者如果无父进程退出。
       wpid = wait((int *) 0);
       if(wpid == pid){
-        // the shell exited; restart it.
+        // 是shell退出了；重启它
         break;
       } else if(wpid < 0){
         printf("init: wait returned an error\n");
         exit(1);
       } else {
-        // it was a parentless process; do nothing.
+        // 无父进程退出，什么都不做
       }
     }
   }
