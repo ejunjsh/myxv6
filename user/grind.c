@@ -1,5 +1,5 @@
 //
-// run random system calls in parallel forever.
+// 永远平行运行随机的系统调用
 //
 
 #include "kernel/param.h"
@@ -12,7 +12,8 @@
 #include "kernel/memlayout.h"
 #include "kernel/riscv.h"
 
-// from FreeBSD.
+// 来自于FreeBSD.
+// 的随机数生成
 int
 do_rand(unsigned long *ctx)
 {
@@ -194,8 +195,8 @@ go(int which_child)
       wait(0);
     } else if(what == 21){
       unlink("c");
-      // should always succeed. check that there are free i-nodes,
-      // file descriptors, blocks.
+      //应该永远成功。检查是否有空闲的inode，
+      //文件描述符、块。
       int fd1 = open("c", O_CREATE|O_RDWR);
       if(fd1 < 0){
         printf("grind: create c failed\n");
