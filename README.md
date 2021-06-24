@@ -17,7 +17,9 @@
 
     brew install qemu
 
-原来xv6的代码在最新qemu里面起来卡住，所以不知道后面更新的qemu是否还能启动，
+原来xv6的代码在最新qemu里面起来卡住，改了些代码后可以启动，
+
+所以不知道后面更新的qemu是否还能启动，
 
 所以记下现在运行的qemu版本：
 
@@ -25,6 +27,10 @@
     qemu: stable 6.0.0 (bottled), HEAD
     Emulator for x86 and PowerPC
     ...
+
+退出qemu:
+
+    ctrl+a,松开,按x
 
 ## 运行
 
