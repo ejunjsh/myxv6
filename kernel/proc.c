@@ -428,7 +428,7 @@ wait(uint64 addr)
 // 调度器不会返回。它会一直循环，做下面的事：
 // - 选择一个进程去运行
 // - 切换并开始运行那个进程
-// - 最后那个进程会切换回到调度器并交出控制权
+// - 最后,那个进程会切换回到调度器并交出控制权
 void
 scheduler(void)
 {
@@ -440,6 +440,7 @@ scheduler(void)
     // 通过确保设备中断是打开的来避免死锁
     intr_on();
 
+    int found = 0;
     for(p = proc; p < &proc[NPROC]; p++) {
       acquire(&p->lock);
       if(p->state == RUNNABLE) {
@@ -452,8 +453,14 @@ scheduler(void)
         // 进程目前已完成运行。
         // 它应该在回来之前改变它的p->state。
         c->proc = 0;
+
+        found = 1;
       }
       release(&p->lock);
+    }
+    if(found == 0){
+      intr_on();
+      wfi(); // 中断来之前，停住cpu
     }
   }
 }
