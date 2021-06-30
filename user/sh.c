@@ -4,7 +4,7 @@
 #include "user/user.h"
 #include "kernel/fcntl.h"
 
-// Parsed command representation
+// 解析的命令表示
 #define EXEC  1
 #define REDIR 2
 #define PIPE  3
@@ -49,11 +49,11 @@ struct backcmd {
   struct cmd *cmd;
 };
 
-int fork1(void);  // Fork but panics on failure.
+int fork1(void);  // Fork 但如果错误则，恐慌(panic)
 void panic(char*);
 struct cmd *parsecmd(char*);
 
-// Execute cmd.  Never returns.
+// 执行命令，不会返回
 void
 runcmd(struct cmd *cmd)
 {
@@ -147,7 +147,7 @@ main(void)
   static char buf[100];
   int fd;
 
-  // Ensure that three file descriptors are open.
+  // 保证这三个文件描述符是打开的
   while((fd = open("console", O_RDWR)) >= 0){
     if(fd >= 3){
       close(fd);
@@ -155,11 +155,11 @@ main(void)
     }
   }
 
-  // Read and run input commands.
+  // 读取和运行输入命令
   while(getcmd(buf, sizeof(buf)) >= 0){
     if(buf[0] == 'c' && buf[1] == 'd' && buf[2] == ' '){
-      // Chdir must be called by the parent, not the child.
-      buf[strlen(buf)-1] = 0;  // chop \n
+      // Chdir 必须被父调用，不能被子调用
+      buf[strlen(buf)-1] = 0;  // 去掉 \n
       if(chdir(buf+3) < 0)
         fprintf(2, "cannot cd %s\n", buf+3);
       continue;
@@ -190,7 +190,7 @@ fork1(void)
 }
 
 //PAGEBREAK!
-// Constructors
+// 构造cmd
 
 struct cmd*
 execcmd(void)
@@ -257,7 +257,7 @@ backcmd(struct cmd *subcmd)
   return (struct cmd*)cmd;
 }
 //PAGEBREAK!
-// Parsing
+// 解析
 
 char whitespace[] = " \t\r\n\v";
 char symbols[] = "<|>&;()";
@@ -445,7 +445,7 @@ parseexec(char **ps, char *es)
   return ret;
 }
 
-// NUL-terminate all the counted strings.
+// NUL终结所有字符串
 struct cmd*
 nulterminate(struct cmd *cmd)
 {

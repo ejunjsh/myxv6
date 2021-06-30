@@ -1,6 +1,6 @@
 # myxv6
 
-看代码并加上中文注释
+看代码并加上中文注释，还有就是做lab
 
 ## 环境
 
@@ -21,12 +21,17 @@
 
 所以不知道后面更新的qemu是否还能启动，
 
-所以记下现在运行的qemu版本：
+所以记下现在运行的版本：
 
-    $ brew info qemu
-    qemu: stable 6.0.0 (bottled), HEAD
-    Emulator for x86 and PowerPC
-    ...
+    $ riscv64-unknown-elf-gcc --version
+    riscv64-unknown-elf-gcc (GCC) 10.2.0
+    Copyright (C) 2020 Free Software Foundation, Inc.
+    This is free software; see the source for copying conditions.  There is NO
+    warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+    $ qemu-system-riscv64 --version
+    QEMU emulator version 6.0.0
+    Copyright (c) 2003-2021 Fabrice Bellard and the QEMU Project developers
 
 退出qemu:
 
