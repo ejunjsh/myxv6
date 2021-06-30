@@ -33,13 +33,14 @@
     QEMU emulator version 6.0.0
     Copyright (c) 2003-2021 Fabrice Bellard and the QEMU Project developers
 
-退出qemu:
-
-    ctrl+a,松开,按x
 
 ## 运行
 
     $ make qemu
+
+## 退出qemu:
+
+    ctrl+a,松开,按x
 
 ## 来自书的截图
 
