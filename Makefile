@@ -131,9 +131,14 @@ UPROGS=\
 	$U/_grind\
 	$U/_wc\
 	$U/_zombie\
+	$U/_sleep\
+	$U/_pingpong\
+	$U/_primes\
+	$U/_find\
+	$U/_xargs\
 
-fs.img: mkfs/mkfs readme $(UPROGS)
-	mkfs/mkfs fs.img readme $(UPROGS)
+fs.img: mkfs/mkfs README $(UPROGS) user/xargstest.sh
+	mkfs/mkfs fs.img README $(UPROGS) user/xargstest.sh
 
 -include kernel/*.d user/*.d
 
@@ -143,7 +148,9 @@ clean:
 	$U/initcode $U/initcode.out $K/kernel fs.img \
 	mkfs/mkfs .gdbinit \
         $U/usys.S \
-	$(UPROGS)
+	$(UPROGS) \
+	xv6.out* \
+	gradelib.pyc
 
 # 尝试去生成一个唯一的GDB端口
 GDBPORT = $(shell expr `id -u` % 5000 + 25000)
@@ -169,3 +176,19 @@ qemu-gdb: $K/kernel .gdbinit fs.img
 	@echo "*** Now run 'gdb' in another window." 1>&2
 	$(QEMU) $(QEMUOPTS) -S $(QEMUGDB)
 
+##
+##  用于测试实验评分脚本
+##
+
+ifneq ($(V),@)
+GRADEFLAGS += -v
+endif
+
+print-gdbport:
+	@echo $(GDBPORT)
+
+grade:
+	@echo $(MAKE) clean
+	@$(MAKE) clean || \
+          (echo "'make clean' failed.  HINT: Do you have another running instance of xv6?" && exit 1)
+	./grade-lab-$(LAB) $(GRADEFLAGS)

@@ -2,9 +2,11 @@
 
 看代码并加上中文注释，还有就是做lab
 
+代码基于2020 MIT 6.S081的xv6-riscv，lab也基于此
+
 ## 环境
 
-我只在macos调试，所以下面环境就是macos环境要安装的，brew自行安装吧😄
+我只在macos intel x86调试，所以下面环境就是macos环境要安装的，brew自行安装吧😄
 
     $ brew tap riscv/riscv
     $ brew install riscv-tools
@@ -41,6 +43,28 @@
 ## 退出qemu:
 
     ctrl+a,松开,按x
+
+## 测试
+
+   $ usertests # 进入系统后执行
+
+## lab
+
+### [Lab Utilities](https://pdos.csail.mit.edu/6.828/2020/labs/util.html)
+
+    ./grade-lab-util                             
+    make: `kernel/kernel' is up to date.
+    == Test sleep, no arguments == sleep, no arguments: OK (1.8s) 
+    == Test sleep, returns == sleep, returns: OK (0.7s) 
+    == Test sleep, makes syscall == sleep, makes syscall: OK (0.9s) 
+    == Test pingpong == pingpong: OK (1.0s) 
+    == Test primes == primes: OK (1.0s) 
+    == Test find, in current directory == find, in current directory: OK (1.2s) 
+    == Test find, recursive == find, recursive: OK (1.6s) 
+    == Test xargs == xargs: OK (1.5s) 
+    == Test time == 
+    time: OK 
+    Score: 100/100
 
 ## 来自书的截图
 
