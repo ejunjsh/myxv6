@@ -9,5 +9,5 @@
 #define MAXOPBLOCKS  10  // 任何文件系统操作写入的最大块数
 #define LOGSIZE      (MAXOPBLOCKS*3)  // 磁盘日志中的最大数据块
 #define NBUF         (MAXOPBLOCKS*3)  // 磁盘块缓存大小
-#define FSSIZE       1000  // 文件系统的大小（以块为单位）
+#define FSSIZE       10000  // 文件系统的大小（以块为单位）
 #define MAXPATH      128   // 最大文件路径名

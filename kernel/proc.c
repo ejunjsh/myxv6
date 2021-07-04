@@ -301,6 +301,9 @@ fork(void)
 
   pid = np->pid;
 
+  // 从父亲那里拷贝跟踪mask给子，实验（systemcall）
+  np->tracemask = p->tracemask;
+
   release(&np->lock);
 
   acquire(&wait_lock);
@@ -649,4 +652,20 @@ procdump(void)
     printf("%d %s %s", p->pid, state, p->name);
     printf("\n");
   }
+}
+
+// 返回进程状态不是UNUSED的数量（实验systemcall）
+uint64 nproc()
+{
+  uint64 cnt = 0;
+  struct proc *p;
+
+  for (p = proc; p < &proc[NPROC]; p++)
+  {
+    acquire(&p->lock);
+    if (p->state != UNUSED)
+      cnt++;
+    release(&p->lock);
+  }
+  return cnt;
 }

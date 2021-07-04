@@ -50,9 +50,13 @@
 
 ## lab
 
+每个lab跑下面每个测试之前最好清空下文件
+
+    make clean
+
 ### [Lab Utilities](https://pdos.csail.mit.edu/6.828/2020/labs/util.html)
 
-    ./grade-lab-util                             
+    $ ./grade-lab-util                             
     make: `kernel/kernel' is up to date.
     == Test sleep, no arguments == sleep, no arguments: OK (1.8s) 
     == Test sleep, returns == sleep, returns: OK (0.7s) 
@@ -65,6 +69,20 @@
     == Test time == 
     time: OK 
     Score: 100/100
+
+
+### [Lab System calls](https://pdos.csail.mit.edu/6.828/2020/labs/syscall.html)
+
+    $ ./grade-lab-syscall
+    make: `kernel/kernel' is up to date.
+    == Test trace 32 grep == trace 32 grep: OK (1.5s) 
+    == Test trace all grep == trace all grep: OK (0.8s) 
+    == Test trace nothing == trace nothing: OK (1.1s) 
+    == Test trace children == trace children: OK (15.1s) 
+    == Test sysinfotest == sysinfotest: OK (2.5s) 
+    == Test time == 
+    time: OK 
+    Score: 35/35
 
 ## 来自书的截图
 
