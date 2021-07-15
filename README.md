@@ -84,6 +84,30 @@
     time: OK 
     Score: 35/35
 
+### [Lab Page tables](https://pdos.csail.mit.edu/6.828/2020/labs/pgtbl.html)
+
+    $ LAB=pgtbl ./grade-lab-pgtbl
+    make: `kernel/kernel' is up to date.
+    == Test pte printout == pte printout: OK (0.9s) 
+    == Test answers-pgtbl.txt == answers-pgtbl.txt: OK 
+    == Test count copyin == count copyin: OK (0.9s) 
+    == Test usertests == (287.8s) 
+    == Test   usertests: copyin == 
+    usertests: copyin: OK 
+    == Test   usertests: copyinstr1 == 
+    usertests: copyinstr1: OK 
+    == Test   usertests: copyinstr2 == 
+    usertests: copyinstr2: OK 
+    == Test   usertests: copyinstr3 == 
+    usertests: copyinstr3: OK 
+    == Test   usertests: sbrkmuch == 
+    usertests: sbrkmuch: OK 
+    == Test   usertests: all tests == 
+    usertests: all tests: OK 
+    == Test time == 
+    time: OK 
+    Score: 66/66
+
 ## 来自书的截图
 
 ![](https://github.com/ejunjsh/myxv6/raw/main/res/1.1.png)

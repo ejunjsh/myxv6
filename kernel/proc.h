@@ -91,8 +91,10 @@ struct proc {
 
   // 这些是进程私有的，因此不需要持有p->lock。
   uint64 kstack;               // 内核栈的虚拟地址
+  char *kstackpa;              // 内核栈的物理地址
   uint64 sz;                   // 进程内存大小（字节）
   pagetable_t pagetable;       // 用户页表
+  pagetable_t kpagetable;      // 用户内核页表
   struct trapframe *trapframe; // trampoline.S的数据页
   struct context context;      // swtch() 到这里然后运行进程
   struct file *ofile[NOFILE];  // 打开的文件

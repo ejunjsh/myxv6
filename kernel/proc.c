@@ -37,6 +37,7 @@ proc_mapstacks(pagetable_t kpgtbl) {
     char *pa = kalloc();
     if(pa == 0)
       panic("kalloc");
+    p->kstackpa = pa;
     uint64 va = KSTACK((int) (p - proc));
     kvmmap(kpgtbl, va, (uint64)pa, PGSIZE, PTE_R | PTE_W);
   }
@@ -135,6 +136,21 @@ found:
     return 0;
   }
 
+  // 创建用户内核页表（lab pagetablb）
+  p->kpagetable = proc_kpagetable();
+  if (p->kpagetable == 0) {
+      freeproc(p);
+      release(&p->lock);
+      return 0;
+  }
+
+  if (mappages(p->kpagetable, (uint64)p->kstack, PGSIZE,
+               (uint64)p->kstackpa, PTE_R | PTE_W) != 0) {
+      freeproc(p);
+      release(&p->lock);
+      return 0;
+  }
+
   // 设置新的上下文开始在forkret执行，它返回用户空间。
   memset(&p->context, 0, sizeof(p->context));
   p->context.ra = (uint64)forkret;
@@ -155,6 +171,9 @@ freeproc(struct proc *p)
   if(p->pagetable)
     proc_freepagetable(p->pagetable, p->sz);
   p->pagetable = 0;
+  if (p->kpagetable)
+    proc_kfreepagetable(p->kpagetable);
+  p->kpagetable = 0;
   p->sz = 0;
   p->pid = 0;
   p->parent = 0;
@@ -231,6 +250,9 @@ userinit(void)
   uvminit(p->pagetable, initcode, sizeof(initcode));
   p->sz = PGSIZE;
 
+  // 拷贝用户页表到用户内核页表
+  kvmcopy(p->pagetable, p->kpagetable, 0, p->sz);
+
   // 准备从内核到用户的第一次“返回”。
   p->trapframe->epc = 0;      // 用户程序计数器
   p->trapframe->sp = PGSIZE;  // 用户栈指针
@@ -256,8 +278,12 @@ growproc(int n)
     if((sz = uvmalloc(p->pagetable, sz, sz + n)) == 0) {
       return -1;
     }
+    if (kvmcopy(p->pagetable, p->kpagetable, p->sz, p->sz + n) != 0) {
+        return -1;
+    }
   } else if(n < 0){
     sz = uvmdealloc(p->pagetable, sz, sz + n);
+    kvmdealloc(p->kpagetable, p->sz, p->sz + n);
   }
   p->sz = sz;
   return 0;
@@ -283,6 +309,14 @@ fork(void)
     release(&np->lock);
     return -1;
   }
+
+  // 拷贝用户页表到用户内核页表
+  if(kvmcopy(np->pagetable, np->kpagetable, 0, p->sz) < 0){
+    freeproc(np);
+    release(&np->lock);
+    return -1;
+  }
+
   np->sz = p->sz;
 
   // 拷贝保存到用户寄存器
@@ -451,11 +485,19 @@ scheduler(void)
         // 释放进程锁，在跳回到这里之前还要重新获取锁，这是进程的工作
         p->state = RUNNING;
         c->proc = p;
+
+        // 切换到用户内核页表
+        w_satp(MAKE_SATP(p->kpagetable));
+        sfence_vma();
+
         swtch(&c->context, &p->context);
 
         // 进程目前已完成运行。
         // 它应该在回来之前改变它的p->state。
         c->proc = 0;
+
+        // 回到调度器就要切换回内核页表
+        kvminithart();
 
         found = 1;
       }

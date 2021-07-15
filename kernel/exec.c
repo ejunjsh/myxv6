@@ -70,6 +70,8 @@ exec(char *path, char **argv)
   uint64 sz1;
   if((sz1 = uvmalloc(pagetable, sz, sz + 2*PGSIZE)) == 0)
     goto bad;
+  if(sz1 >= PLIC)
+    goto bad;
   sz = sz1;
   uvmclear(pagetable, sz-2*PGSIZE);
   sp = sz;
@@ -110,10 +112,19 @@ exec(char *path, char **argv)
   // 提交到用户映像。
   oldpagetable = p->pagetable;
   p->pagetable = pagetable;
+
+  // 销毁用户内核页表
+  kvmdealloc(p->kpagetable, p->sz, 0);
+  if (kvmcopy(p->pagetable, p->kpagetable, 0, sz) < 0) 
+    goto bad;
+
   p->sz = sz;
   p->trapframe->epc = elf.entry;  // 初始程序计数器 = main
   p->trapframe->sp = sp; // 初始堆栈指针
   proc_freepagetable(oldpagetable, oldsz);
+
+  // 打印init的页表 （lab pagetable）
+  if(p->pid==1) vmprint(p->pagetable);
 
   return argc; // 结果是a0，main(argc, argv)的第一个参数
 
