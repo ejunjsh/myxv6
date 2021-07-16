@@ -151,6 +151,9 @@ UPROGS=\
 	$U/_trace\
 	$U/_sysinfotest\
 	$U/_stats\
+	$U/_call\
+	$U/_alarmtest\
+	$U/_bttest
 
 fs.img: mkfs/mkfs README $(UPROGS) user/xargstest.sh
 	mkfs/mkfs fs.img README $(UPROGS) user/xargstest.sh

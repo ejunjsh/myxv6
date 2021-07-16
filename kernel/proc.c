@@ -151,6 +151,8 @@ found:
       return 0;
   }
 
+  p->duration = p->ticks = 0;
+
   // 设置新的上下文开始在forkret执行，它返回用户空间。
   memset(&p->context, 0, sizeof(p->context));
   p->context.ra = (uint64)forkret;

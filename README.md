@@ -108,6 +108,25 @@
     time: OK 
     Score: 66/66
 
+### [Lab Traps](https://pdos.csail.mit.edu/6.828/2020/labs/traps.html)
+
+    $ ./grade-lab-traps
+    make: `kernel/kernel' is up to date.
+    == Test answers-traps.txt == answers-traps.txt: OK 
+    == Test backtrace test == backtrace test: OK (1.1s) 
+    == Test running alarmtest == (4.5s) 
+    == Test   alarmtest: test0 == 
+    alarmtest: test0: OK 
+    == Test   alarmtest: test1 == 
+    alarmtest: test1: OK 
+    == Test   alarmtest: test2 == 
+    alarmtest: test2: OK 
+    == Test usertests == usertests: OK (305.4s) 
+        (Old xv6.out.usertests failure log removed)
+    == Test time == 
+    time: OK 
+    Score: 85/85
+
 ## 来自书的截图
 
 ![](https://github.com/ejunjsh/myxv6/raw/main/res/1.1.png)

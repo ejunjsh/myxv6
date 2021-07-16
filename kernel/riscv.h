@@ -353,6 +353,15 @@ sfence_vma()
   asm volatile("sfence.vma zero, zero");
 }
 
+// 读取栈地址
+static inline uint64
+r_fp()
+{
+    uint64 x;
+    asm volatile("mv %0, s0" : "=r" (x) );
+    return x;
+}
+
 
 #define PGSIZE 4096 // 每一个页的字节数
 #define PGSHIFT 12  // 页内的偏移位

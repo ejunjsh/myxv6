@@ -101,4 +101,8 @@ struct proc {
   struct inode *cwd;           // 当前目录
   char name[16];               // 进程名字(调试用)
   int tracemask;               // 实验（syscall）加的，用来跟踪系统调用
+  int ticks;
+  int duration;
+  uint64 handler;
+  struct trapframe state_time;
 };

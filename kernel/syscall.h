@@ -22,3 +22,5 @@
 #define SYS_close  21
 #define SYS_trace  22
 #define SYS_sysinfo  23
+#define SYS_sigalarm  24
+#define SYS_sigreturn 25

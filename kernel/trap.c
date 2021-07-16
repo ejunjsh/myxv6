@@ -75,8 +75,18 @@ usertrap(void)
     exit(-1);
 
   // 如果是一个定时中断，则让出CPU
-  if(which_dev == 2)
-    yield();
+  // Lab traps
+    if(which_dev == 2) {
+      if (p->ticks > 0 && p->duration > -1) {
+          p->duration++;
+          if (p->duration >= p->ticks) {
+              p->duration = -1;
+              p->state_time = *p->trapframe;
+              p->trapframe->epc = p->handler;
+              intr_on();
+          } else yield();
+      } else yield();
+  }
 
   usertrapret();
 }

@@ -105,6 +105,8 @@ extern uint64 sys_write(void);
 extern uint64 sys_uptime(void);
 extern uint64 sys_trace(void);
 extern uint64 sys_sysinfo(void);
+extern uint64 sys_sigalarm(void);
+extern uint64 sys_sigreturn(void);
 
 static uint64 (*syscalls[])(void) = {
 [SYS_fork]    sys_fork,
@@ -130,6 +132,8 @@ static uint64 (*syscalls[])(void) = {
 [SYS_close]   sys_close,
 [SYS_trace]   sys_trace,
 [SYS_sysinfo]   sys_sysinfo,
+[SYS_sigalarm]   sys_sigalarm,
+[SYS_sigreturn]  sys_sigreturn,
 };
 
 char * syscall_name[NELEM(syscalls)] = {
@@ -137,7 +141,7 @@ char * syscall_name[NELEM(syscalls)] = {
   "read", "kill", "exec", "fstat", "chdir",
   "dup", "getpid", "sbrk", "sleep", "uptime",
   "open", "write", "mknod", "unlink", "link",
-  "mkdir", "close", "trace","sysinfo",
+  "mkdir", "close", "trace","sysinfo","sigalarm","sigreturn"
 };
 
 void
