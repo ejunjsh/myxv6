@@ -153,7 +153,8 @@ UPROGS=\
 	$U/_stats\
 	$U/_call\
 	$U/_alarmtest\
-	$U/_bttest
+	$U/_bttest\
+	$U/_lazytests\
 
 fs.img: mkfs/mkfs README $(UPROGS) user/xargstest.sh
 	mkfs/mkfs fs.img README $(UPROGS) user/xargstest.sh

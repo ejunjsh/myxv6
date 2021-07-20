@@ -50,6 +50,8 @@
 
 ## lab
 
+这个lab跟原来的不同，是每个lab是基于上个lab基础继续做的，所以这样最后代码就基本是所有lab的集合，很有挑战哈
+
 每个lab跑下面每个测试之前最好清空下文件
 
     make clean
@@ -126,6 +128,136 @@
     == Test time == 
     time: OK 
     Score: 85/85
+
+### [Lazy page allocation](https://pdos.csail.mit.edu/6.828/2020/labs/lazy.html)
+
+由于 [Lab Page tables](https://pdos.csail.mit.edu/6.828/2020/labs/pgtbl.html) 的限制了进程要小于PLIC，
+
+所以 [Lab System calls](https://pdos.csail.mit.edu/6.828/2020/labs/syscall.html) 的某个测试不过
+
+当前这个lab的测试也相应改了限制
+
+    $ ./grade-lab-lazy
+    make: `kernel/kernel' is up to date.
+    == Test running lazytests == (1.6s) 
+    == Test   lazy: map == 
+    lazy: map: OK 
+    == Test   lazy: unmap == 
+    lazy: unmap: OK 
+    == Test usertests == (230.8s) 
+    == Test   usertests: pgbug == 
+    usertests: pgbug: OK 
+    == Test   usertests: sbrkbugs == 
+    usertests: sbrkbugs: OK 
+    == Test   usertests: argptest == 
+    usertests: argptest: OK 
+    == Test   usertests: sbrkmuch == 
+    usertests: sbrkmuch: OK 
+    == Test   usertests: sbrkfail == 
+    usertests: sbrkfail: OK 
+    == Test   usertests: sbrkarg == 
+    usertests: sbrkarg: OK 
+    == Test   usertests: stacktest == 
+    usertests: stacktest: OK 
+    == Test   usertests: execout == 
+    usertests: execout: OK 
+    == Test   usertests: copyin == 
+    usertests: copyin: OK 
+    == Test   usertests: copyout == 
+    usertests: copyout: OK 
+    == Test   usertests: copyinstr1 == 
+    usertests: copyinstr1: OK 
+    == Test   usertests: copyinstr2 == 
+    usertests: copyinstr2: OK 
+    == Test   usertests: copyinstr3 == 
+    usertests: copyinstr3: OK 
+    == Test   usertests: rwsbrk == 
+    usertests: rwsbrk: OK 
+    == Test   usertests: truncate1 == 
+    usertests: truncate1: OK 
+    == Test   usertests: truncate2 == 
+    usertests: truncate2: OK 
+    == Test   usertests: truncate3 == 
+    usertests: truncate3: OK 
+    == Test   usertests: reparent2 == 
+    usertests: reparent2: OK 
+    == Test   usertests: badarg == 
+    usertests: badarg: OK 
+    == Test   usertests: reparent == 
+    usertests: reparent: OK 
+    == Test   usertests: twochildren == 
+    usertests: twochildren: OK 
+    == Test   usertests: forkfork == 
+    usertests: forkfork: OK 
+    == Test   usertests: forkforkfork == 
+    usertests: forkforkfork: OK 
+    == Test   usertests: createdelete == 
+    usertests: createdelete: OK 
+    == Test   usertests: linkunlink == 
+    usertests: linkunlink: OK 
+    == Test   usertests: linktest == 
+    usertests: linktest: OK 
+    == Test   usertests: unlinkread == 
+    usertests: unlinkread: OK 
+    == Test   usertests: concreate == 
+    usertests: concreate: OK 
+    == Test   usertests: subdir == 
+    usertests: subdir: OK 
+    == Test   usertests: fourfiles == 
+    usertests: fourfiles: OK 
+    == Test   usertests: sharedfd == 
+    usertests: sharedfd: OK 
+    == Test   usertests: exectest == 
+    usertests: exectest: OK 
+    == Test   usertests: bigargtest == 
+    usertests: bigargtest: OK 
+    == Test   usertests: bigwrite == 
+    usertests: bigwrite: OK 
+    == Test   usertests: bsstest == 
+    usertests: bsstest: OK 
+    == Test   usertests: sbrkbasic == 
+    usertests: sbrkbasic: OK 
+    == Test   usertests: kernmem == 
+    usertests: kernmem: OK 
+    == Test   usertests: validatetest == 
+    usertests: validatetest: OK 
+    == Test   usertests: opentest == 
+    usertests: opentest: OK 
+    == Test   usertests: writetest == 
+    usertests: writetest: OK 
+    == Test   usertests: writebig == 
+    usertests: writebig: OK 
+    == Test   usertests: createtest == 
+    usertests: createtest: OK 
+    == Test   usertests: openiput == 
+    usertests: openiput: OK 
+    == Test   usertests: exitiput == 
+    usertests: exitiput: OK 
+    == Test   usertests: iput == 
+    usertests: iput: OK 
+    == Test   usertests: mem == 
+    usertests: mem: OK 
+    == Test   usertests: pipe1 == 
+    usertests: pipe1: OK 
+    == Test   usertests: preempt == 
+    usertests: preempt: OK 
+    == Test   usertests: exitwait == 
+    usertests: exitwait: OK 
+    == Test   usertests: rmdot == 
+    usertests: rmdot: OK 
+    == Test   usertests: fourteen == 
+    usertests: fourteen: OK 
+    == Test   usertests: bigfile == 
+    usertests: bigfile: OK 
+    == Test   usertests: dirfile == 
+    usertests: dirfile: OK 
+    == Test   usertests: iref == 
+    usertests: iref: OK 
+    == Test   usertests: forktest == 
+    usertests: forktest: OK 
+    == Test time == 
+    time: OK 
+    Score: 119/119
 
 ## 来自书的截图
 

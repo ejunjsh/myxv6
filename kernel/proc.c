@@ -713,3 +713,43 @@ uint64 nproc()
   }
   return cnt;
 }
+
+// 处理缺页
+int handle_pagefault(uint64 va, struct proc *p) {
+    uint64 base =  PGROUNDDOWN(va);
+    if (va >= p->sz || va < p->trapframe->sp) {
+      return -1;
+    }
+    char *mem = kalloc();
+    if (mem == 0) return -1;
+    memset(mem, 0, PGSIZE);
+    if(mappages(p->pagetable, base, PGSIZE, (uint64)mem, PTE_W|PTE_X|PTE_R|PTE_U) != 0) {
+        kfree(mem); 
+        return -1;
+    }
+    return 0;
+}
+
+// 处理缺页
+int handle_kpagefault(uint64 va, struct proc *p) {
+    uint64 base =  PGROUNDDOWN(va);
+    if (va >= p->sz || va < p->trapframe->sp) {
+      return -1;
+    }
+    char *mem = 0;
+    uint64 pa = walkaddr(p->pagetable, base);
+    if(pa == 0){
+        char *mem = kalloc();
+        if (mem == 0) return -1;
+        memset(mem, 0, PGSIZE);
+        if(mappages(p->pagetable, base, PGSIZE, (uint64)mem, PTE_W|PTE_X|PTE_R|PTE_U) != 0) {
+            kfree(mem); 
+            return -1;
+        }
+    }
+    if (kvmcopy(p->pagetable, p->kpagetable, base, base + PGSIZE) != 0) {
+        if(mem!=0) kfree(mem);
+        return -1;
+    }
+    return 0;
+}

@@ -66,9 +66,15 @@ usertrap(void)
   } else if((which_dev = devintr()) != 0){
     // ok
   } else {
-    printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
-    printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
-    p->killed = 1;
+    if (r_scause() == 13 || r_scause() == 15) {
+          uint64 va = r_stval(); 
+          if (handle_pagefault(va, p) ==  -1) 
+            p->killed = 1;
+      } else {
+          printf("usertrap(): unexpected scause %p pid=%d\n", r_scause(), p->pid);
+          printf("            sepc=%p stval=%p\n", r_sepc(), r_stval());
+          p->killed = 1;
+      }
   }
 
   if(p->killed)
@@ -148,10 +154,21 @@ kerneltrap()
   if(intr_get() != 0)
     panic("kerneltrap: interrupts enabled");
 
-  if((which_dev = devintr()) == 0){
-    printf("scause %p\n", scause);
-    printf("sepc=%p stval=%p\n", r_sepc(), r_stval());
-    panic("kerneltrap");
+  if((which_dev = devintr()) != 0){
+    //ok
+  }else {
+    struct proc *p = myproc();
+    if (r_scause() == 13 || r_scause() == 15) {
+          uint64 va = r_stval(); 
+          if (handle_kpagefault(va, p) == -1) {
+            p->killed = 1;
+            exit(-1);
+          }
+      } else {
+          printf("scause %p\n", scause);
+          printf("sepc=%p stval=%p\n", r_sepc(), r_stval());
+          panic("kerneltrap");
+      }
   }
 
   // 如果是定时中断，则让出CPU
