@@ -81,7 +81,9 @@ sys_sleep(void)
     sleep(&ticks, &tickslock);
   }
   release(&tickslock);
-  backtrace();
+  #ifdef LAB_TRAPS
+    backtrace();
+  #endif
   return 0;
 }
 

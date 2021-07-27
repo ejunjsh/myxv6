@@ -8,8 +8,7 @@
 #include "kernel/memlayout.h"
 #include "kernel/riscv.h"
 
-//#define REGION_SZ (1024 * 1024 * 1024)
-#define REGION_SZ (1024 * 1024) // 由于lab 内核页表限制了进程大小必须小于PLIC，所以这里大小也要改小
+#define REGION_SZ (1024 * 1024 * 1024)
 
 void
 sparse_memory(char *s)

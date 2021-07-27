@@ -21,10 +21,17 @@ struct {
   struct run *freelist;
 } kmem;
 
+// 页的引用计数，lab cow
+struct {
+    struct spinlock lock;
+    uint a[32768]; 
+} refcnt;
+
 void
 kinit()
 {
   initlock(&kmem.lock, "kmem");
+  initlock(&refcnt.lock, "refcnt");
   freerange(end, (void*)PHYSTOP);
 }
 
@@ -46,6 +53,17 @@ kfree(void *pa)
 
   if(((uint64)pa % PGSIZE) != 0 || (char*)pa < end || (uint64)pa >= PHYSTOP)
     panic("kfree");
+
+  if ((uint64)pa >= KERNBASE) {
+      acquire(&refcnt.lock);
+      if (refcnt.a[((uint64)pa - KERNBASE) >> PGSHIFT] > 1) {
+          refcnt.a[((uint64)pa - KERNBASE) >> PGSHIFT]--;
+          release(&refcnt.lock); return;
+      } else {
+          refcnt.a[((uint64)pa - KERNBASE) >> PGSHIFT] = 0;
+          release(&refcnt.lock);
+      }
+  }
 
   // 用垃圾数据填充来避免悬挂引用
   memset(pa, 1, PGSIZE);
@@ -73,6 +91,7 @@ kalloc(void)
 
   if(r)
     memset((char*)r, 5, PGSIZE); // 填充垃圾数据
+  kref((uint64)r);
   return (void*)r;
 }
 
@@ -90,4 +109,13 @@ uint64 nfree()
   }
   release(&kmem.lock);
   return cnt * PGSIZE;
+}
+
+// 引用计数
+void kref(uint64 pa) {
+  if (pa >= KERNBASE) {
+      acquire(&refcnt.lock);
+      refcnt.a[(pa - KERNBASE) >> PGSHIFT]++;
+      release(&refcnt.lock);
+  }
 }

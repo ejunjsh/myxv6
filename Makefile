@@ -155,6 +155,7 @@ UPROGS=\
 	$U/_alarmtest\
 	$U/_bttest\
 	$U/_lazytests\
+	$U/_cowtest\
 
 fs.img: mkfs/mkfs README $(UPROGS) user/xargstest.sh
 	mkfs/mkfs fs.img README $(UPROGS) user/xargstest.sh

@@ -112,7 +112,7 @@
 
 ### [Lab Traps](https://pdos.csail.mit.edu/6.828/2020/labs/traps.html)
 
-    $ ./grade-lab-traps
+    $ LAB=traps ./grade-lab-traps
     make: `kernel/kernel' is up to date.
     == Test answers-traps.txt == answers-traps.txt: OK 
     == Test backtrace test == backtrace test: OK (1.1s) 
@@ -130,12 +130,6 @@
     Score: 85/85
 
 ### [Lazy page allocation](https://pdos.csail.mit.edu/6.828/2020/labs/lazy.html)
-
-由于 [Lab Page tables](https://pdos.csail.mit.edu/6.828/2020/labs/pgtbl.html) 的限制了进程要小于PLIC，
-
-所以 [Lab System calls](https://pdos.csail.mit.edu/6.828/2020/labs/syscall.html) 的某个测试不过
-
-当前这个lab的测试也相应改了限制
 
     $ ./grade-lab-lazy
     make: `kernel/kernel' is up to date.
@@ -258,6 +252,27 @@
     == Test time == 
     time: OK 
     Score: 119/119
+
+### [Lab Copy-on-Write Fork for xv6](https://pdos.csail.mit.edu/6.828/2020/labs/cow.html)
+
+    $ ./grade-lab-cow 
+    == Test running cowtest == (11.4s) 
+    == Test   simple == 
+    simple: OK 
+    == Test   three == 
+    three: OK 
+    == Test   file == 
+    file: OK 
+    == Test usertests == (192.0s) 
+    == Test   usertests: copyin == 
+    usertests: copyin: OK 
+    == Test   usertests: copyout == 
+    usertests: copyout: OK 
+    == Test   usertests: all tests == 
+    usertests: all tests: OK 
+    == Test time == 
+    time: OK 
+    Score: 110/110
 
 ## 来自书的截图
 

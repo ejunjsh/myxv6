@@ -374,6 +374,7 @@ r_fp()
 #define PTE_W (1L << 2)
 #define PTE_X (1L << 3)
 #define PTE_U (1L << 4) // 1 -> 用户可以访问
+#define PTE_C (1L << 8) // 写时拷贝（lab cow）
 
 // 移动物理地址到一个正确地方就能转化为PTE
 #define PA2PTE(pa) ((((uint64)pa) >> 12) << 10)

@@ -115,8 +115,6 @@ exec(char *path, char **argv)
 
   // 销毁用户内核页表
   kvmdealloc(p->kpagetable, p->sz, 0);
-  if (kvmcopy(p->pagetable, p->kpagetable, 0, sz) < 0) 
-    goto bad;
 
   p->sz = sz;
   p->trapframe->epc = elf.entry;  // 初始程序计数器 = main

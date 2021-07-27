@@ -252,8 +252,6 @@ userinit(void)
   uvminit(p->pagetable, initcode, sizeof(initcode));
   p->sz = PGSIZE;
 
-  // 拷贝用户页表到用户内核页表
-  kvmcopy(p->pagetable, p->kpagetable, 0, p->sz);
 
   // 准备从内核到用户的第一次“返回”。
   p->trapframe->epc = 0;      // 用户程序计数器
@@ -279,9 +277,6 @@ growproc(int n)
   if(n > 0){
     if((sz = uvmalloc(p->pagetable, sz, sz + n)) == 0) {
       return -1;
-    }
-    if (kvmcopy(p->pagetable, p->kpagetable, p->sz, p->sz + n) != 0) {
-        return -1;
     }
   } else if(n < 0){
     sz = uvmdealloc(p->pagetable, sz, sz + n);
@@ -312,12 +307,6 @@ fork(void)
     return -1;
   }
 
-  // 拷贝用户页表到用户内核页表
-  if(kvmcopy(np->pagetable, np->kpagetable, 0, p->sz) < 0){
-    freeproc(np);
-    release(&np->lock);
-    return -1;
-  }
 
   np->sz = p->sz;
 
@@ -423,7 +412,6 @@ wait(uint64 addr)
   struct proc *p = myproc();
 
   acquire(&wait_lock);
-
   for(;;){
     // 在表中搜索退出的子进程
     havekids = 0;
@@ -714,29 +702,50 @@ uint64 nproc()
   return cnt;
 }
 
-// 处理缺页
+// 处理用户缺页
 int handle_pagefault(uint64 va, struct proc *p) {
     uint64 base =  PGROUNDDOWN(va);
-    if (va >= p->sz || va < p->trapframe->sp) {
+    if (va >= p->sz) {
       return -1;
     }
-    char *mem = kalloc();
-    if (mem == 0) return -1;
-    memset(mem, 0, PGSIZE);
-    if(mappages(p->pagetable, base, PGSIZE, (uint64)mem, PTE_W|PTE_X|PTE_R|PTE_U) != 0) {
+
+    pte_t *pte; char *mem; uint flags;
+    if ((pte = walk(p->pagetable, va, 0)) && *pte & PTE_C) {
+      if ((mem = kalloc()) == 0) return -1;
+      flags = PTE_FLAGS((*pte & (~PTE_C)) | PTE_W);
+      uint64 pa = PTE2PA(*pte);
+      memmove(mem, (char*)pa, PGSIZE);
+      *pte = PA2PTE((uint64)mem) | flags;
+      kfree((void *)pa);
+      pte = walk(p->kpagetable, va, 1);
+      flags = flags & (~PTE_U);
+      *pte = PA2PTE((uint64)mem) | flags; 
+    }
+    else{
+      if(!pte || !*pte){
+        if ((mem = kalloc()) == 0) return -1;
+        memset(mem, 0, PGSIZE);
+        if(mappages(p->pagetable, base, PGSIZE, (uint64)mem, PTE_W|PTE_X|PTE_R|PTE_U) != 0) {
+            kfree(mem); 
         kfree(mem); 
+            kfree(mem); 
+        kfree(mem); 
+            kfree(mem); 
+            return -1;
+        }
+      } else{
         return -1;
+      } 
     }
     return 0;
 }
 
-// 处理缺页
+// 处理内核缺页
 int handle_kpagefault(uint64 va, struct proc *p) {
     uint64 base =  PGROUNDDOWN(va);
-    if (va >= p->sz || va < p->trapframe->sp) {
+    if (va >= p->sz) {
       return -1;
     }
-    char *mem = 0;
     uint64 pa = walkaddr(p->pagetable, base);
     if(pa == 0){
         char *mem = kalloc();
@@ -748,7 +757,6 @@ int handle_kpagefault(uint64 va, struct proc *p) {
         }
     }
     if (kvmcopy(p->pagetable, p->kpagetable, base, base + PGSIZE) != 0) {
-        if(mem!=0) kfree(mem);
         return -1;
     }
     return 0;
