@@ -48,15 +48,15 @@
 
    $ usertests # 进入系统后执行
 
-## lab
+## Lab
 
 这个lab跟原来的不同，是每个lab是基于上个lab基础继续做的，所以这样最后代码就基本是所有lab的集合，很有挑战哈
 
-每个lab跑下面每个测试之前最好清空下文件
+每个lab跑测试之前最好清空下文件
 
     make clean
 
-### [Lab Utilities](https://pdos.csail.mit.edu/6.828/2020/labs/util.html)
+### [Utilities（工具）](https://pdos.csail.mit.edu/6.828/2020/labs/util.html)
 
     $ ./grade-lab-util                             
     make: `kernel/kernel' is up to date.
@@ -73,7 +73,7 @@
     Score: 100/100
 
 
-### [Lab System calls](https://pdos.csail.mit.edu/6.828/2020/labs/syscall.html)
+### [System calls（系统调用）](https://pdos.csail.mit.edu/6.828/2020/labs/syscall.html)
 
     $ ./grade-lab-syscall
     make: `kernel/kernel' is up to date.
@@ -86,7 +86,7 @@
     time: OK 
     Score: 35/35
 
-### [Lab Page tables](https://pdos.csail.mit.edu/6.828/2020/labs/pgtbl.html)
+### [Page tables（页表）](https://pdos.csail.mit.edu/6.828/2020/labs/pgtbl.html)
 
     $ LAB=pgtbl ./grade-lab-pgtbl
     make: `kernel/kernel' is up to date.
@@ -110,7 +110,7 @@
     time: OK 
     Score: 66/66
 
-### [Lab Traps](https://pdos.csail.mit.edu/6.828/2020/labs/traps.html)
+### [Traps（陷阱）](https://pdos.csail.mit.edu/6.828/2020/labs/traps.html)
 
     $ LAB=traps ./grade-lab-traps
     make: `kernel/kernel' is up to date.
@@ -129,7 +129,7 @@
     time: OK 
     Score: 85/85
 
-### [Lazy page allocation](https://pdos.csail.mit.edu/6.828/2020/labs/lazy.html)
+### [Lazy page allocation（页的延迟分配）](https://pdos.csail.mit.edu/6.828/2020/labs/lazy.html)
 
     $ ./grade-lab-lazy
     make: `kernel/kernel' is up to date.
@@ -253,7 +253,7 @@
     time: OK 
     Score: 119/119
 
-### [Lab Copy-on-Write Fork for xv6](https://pdos.csail.mit.edu/6.828/2020/labs/cow.html)
+### [Copy-on-Write Fork（fork的写时复制）](https://pdos.csail.mit.edu/6.828/2020/labs/cow.html)
 
     $ ./grade-lab-cow 
     == Test running cowtest == (11.4s) 
@@ -273,6 +273,21 @@
     == Test time == 
     time: OK 
     Score: 110/110
+
+### [Multithreading（多线程）](https://pdos.csail.mit.edu/6.828/2020/labs/thread.html)
+
+    $ ./grade-lab-thread
+    == Test uthread == uthread: OK (7.0s) 
+    == Test answers-thread.txt == answers-thread.txt: OK 
+    == Test ph_safe == gcc -o ph -g -O2 notxv6/ph.c -pthread
+    ph_safe: OK (8.9s) 
+    == Test ph_fast == make: `ph' is up to date.
+    ph_fast: OK (18.1s) 
+    == Test barrier == gcc -o barrier -g -O2 notxv6/barrier.c -pthread
+    barrier: OK (2.3s) 
+    == Test time == 
+    time: OK 
+    Score: 60/60
 
 ## 来自书的截图
 

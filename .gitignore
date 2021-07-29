@@ -17,3 +17,6 @@ user/usys.S
 .gdbinit
 *.pyc
 xv6.out*
+ph
+*.dSYM
+barrier
