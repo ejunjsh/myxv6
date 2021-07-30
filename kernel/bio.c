@@ -21,14 +21,17 @@
 #include "fs.h"
 #include "buf.h"
 
+#define BNUM 17
+
 struct {
   struct spinlock lock;
+  struct spinlock block[BNUM];
   struct buf buf[NBUF];
 
   // 所有缓冲区的链表，通过head.next/head.prev。
   // 按最近使用缓冲区的时间排序。
   // head.next是最近的，head.prev是最少的。
-  struct buf head;
+  struct buf head[BNUM];
 } bcache;
 
 void
@@ -39,14 +42,17 @@ binit(void)
   initlock(&bcache.lock, "bcache");
 
   // 创建缓冲区的链表
-  bcache.head.prev = &bcache.head;
-  bcache.head.next = &bcache.head;
+  for (int i = 0; i < BNUM; i++) {
+      initlock(bcache.block + i, "bcache");
+      bcache.head[i].prev = &bcache.head[i];
+      bcache.head[i].next = &bcache.head[i];
+  }
   for(b = bcache.buf; b < bcache.buf+NBUF; b++){
-    b->next = bcache.head.next;
-    b->prev = &bcache.head;
+    b->next = bcache.head[0].next;
+    b->prev = &bcache.head[0];
     initsleeplock(&b->lock, "buffer");
-    bcache.head.next->prev = b;
-    bcache.head.next = b;
+    bcache.head[0].next->prev = b;
+    bcache.head[0].next = b;
   }
 }
 
@@ -58,13 +64,14 @@ bget(uint dev, uint blockno)
 {
   struct buf *b;
 
-  acquire(&bcache.lock);
+  int entry = blockno % BNUM;
+  acquire(bcache.block + entry);
 
   // 块是否已缓存？
-  for(b = bcache.head.next; b != &bcache.head; b = b->next){
+  for(b = bcache.head[entry].next; b != &bcache.head[entry]; b = b->next){
     if(b->dev == dev && b->blockno == blockno){
       b->refcnt++;
-      release(&bcache.lock);
+      release(bcache.block + entry);
       acquiresleep(&b->lock);
       return b;
     }
@@ -72,16 +79,30 @@ bget(uint dev, uint blockno)
 
   // 未缓存。
   // 回收最近最少使用的（LRU）未使用的缓冲区。
-  for(b = bcache.head.prev; b != &bcache.head; b = b->prev){
-    if(b->refcnt == 0) {
-      b->dev = dev;
-      b->blockno = blockno;
-      b->valid = 0;
-      b->refcnt = 1;
-      release(&bcache.lock);
-      acquiresleep(&b->lock);
-      return b;
-    }
+  for (int i = (entry + 1) % BNUM; i != entry; i = (i + 1) % BNUM) {
+      struct buf *bb = 0;
+      acquire(bcache.block + i);
+      for(b = bcache.head[i].prev; b != &bcache.head[i]; b = b->prev)
+          if (b->refcnt == 0) {
+              bb = b;
+          }
+      if (bb != 0) {
+          bb->dev = dev;
+          bb->blockno = blockno;
+          bb->valid = 0;
+          bb->refcnt = 1;
+          bb->next->prev = bb->prev;
+          bb->prev->next = bb->next;
+          bb->next = bcache.head[entry].next;
+          bb->prev = &bcache.head[entry];
+          bcache.head[entry].next->prev = bb;
+          bcache.head[entry].next = bb;
+          release(bcache.block + i);
+          release(bcache.block + entry);
+          acquiresleep(&bb->lock);
+          return bb;
+      }
+      release(bcache.block + i);
   }
   panic("bget: no buffers");
 }
@@ -119,33 +140,36 @@ brelse(struct buf *b)
 
   releasesleep(&b->lock);
 
-  acquire(&bcache.lock);
+  int entry = b->blockno % BNUM;
+  acquire(bcache.block + entry);
   b->refcnt--;
   if (b->refcnt == 0) {
     // 没有人在等它。
     b->next->prev = b->prev;
     b->prev->next = b->next;
-    b->next = bcache.head.next;
-    b->prev = &bcache.head;
-    bcache.head.next->prev = b;
-    bcache.head.next = b;
+    b->next = bcache.head[entry].next;
+    b->prev = &bcache.head[entry];
+    bcache.head[entry].next->prev = b;
+    bcache.head[entry].next = b;
   }
   
-  release(&bcache.lock);
+  release(bcache.block + entry);
 }
 
 void
 bpin(struct buf *b) {
-  acquire(&bcache.lock);
+  int entry = b->blockno % BNUM;
+  acquire(bcache.block + entry);
   b->refcnt++;
-  release(&bcache.lock);
+  release(bcache.block + entry);
 }
 
 void
 bunpin(struct buf *b) {
-  acquire(&bcache.lock);
+  int entry = b->blockno % BNUM;
+  acquire(bcache.block + entry);
   b->refcnt--;
-  release(&bcache.lock);
+  release(bcache.block + entry);
 }
 
 

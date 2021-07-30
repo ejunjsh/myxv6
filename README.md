@@ -289,6 +289,26 @@
     time: OK 
     Score: 60/60
 
+### [Lock（锁）](https://pdos.csail.mit.edu/6.828/2020/labs/lock.html)
+
+    $ LAB=lock ./grade-lab-lock
+    make: `kernel/kernel' is up to date.
+    == Test running kalloctest == (413.1s) 
+    == Test   kalloctest: test1 == 
+    kalloctest: test1: OK 
+    == Test   kalloctest: test2 == 
+    kalloctest: test2: OK 
+    == Test kalloctest: sbrkmuch == kalloctest: sbrkmuch: OK (18.8s) 
+    == Test running bcachetest == (16.6s) 
+    == Test   bcachetest: test0 == 
+    bcachetest: test0: OK 
+    == Test   bcachetest: test1 == 
+    bcachetest: test1: OK 
+    == Test usertests == usertests: OK (244.3s) 
+    == Test time == 
+    time: OK 
+    Score: 70/70
+
 ## 来自书的截图
 
 ![](https://github.com/ejunjsh/myxv6/raw/main/res/1.1.png)

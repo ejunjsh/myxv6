@@ -19,7 +19,7 @@ struct run {
 struct {
   struct spinlock lock;
   struct run *freelist;
-} kmem;
+} kmem[NCPU];
 
 // 页的引用计数，lab cow
 struct {
@@ -30,7 +30,8 @@ struct {
 void
 kinit()
 {
-  initlock(&kmem.lock, "kmem");
+  for (int i = 0; i < NCPU; i++) 
+    initlock(&kmem[i].lock, "kmem");
   initlock(&refcnt.lock, "refcnt");
   freerange(end, (void*)PHYSTOP);
 }
@@ -70,10 +71,11 @@ kfree(void *pa)
 
   r = (struct run*)pa;
 
-  acquire(&kmem.lock);
-  r->next = kmem.freelist;
-  kmem.freelist = r;
-  release(&kmem.lock);
+  int cpu_id; push_off(); cpu_id = cpuid(); pop_off();
+  acquire(&kmem[cpu_id].lock);
+  r->next = kmem[cpu_id].freelist;
+  kmem[cpu_id].freelist = r;
+  release(&kmem[cpu_id].lock);
 }
 
 // 分配一个4096字节的物理内存页，返回一个指针给内核
@@ -83,11 +85,24 @@ kalloc(void)
 {
   struct run *r;
 
-  acquire(&kmem.lock);
-  r = kmem.freelist;
-  if(r)
-    kmem.freelist = r->next;
-  release(&kmem.lock);
+  int cpu_id; push_off(); cpu_id = cpuid(); pop_off();
+  acquire(&kmem[cpu_id].lock);
+  r = kmem[cpu_id].freelist;
+  if(r) {
+      kmem[cpu_id].freelist = r->next;
+      release(&kmem[cpu_id].lock);
+  } else {
+      release(&kmem[cpu_id].lock);
+      for (int i = 0; i < NCPU; i++) if (i != cpu_id) {
+          acquire(&kmem[i].lock);
+          r = kmem[i].freelist;
+          if (r) {
+              kmem[i].freelist = r->next;
+              release(&kmem[i].lock);
+              break;
+          } else release(&kmem[i].lock);
+      }
+  }
 
   if(r)
     memset((char*)r, 5, PGSIZE); // 填充垃圾数据
@@ -100,14 +115,16 @@ uint64 nfree()
 {
   struct run* r;
   uint64 cnt = 0;
-  acquire(&kmem.lock);
-  r = kmem.freelist;
-  while (r)
-  {
-    cnt++;
-    r = r->next;
+  for (int i = 0; i < NCPU; i++){
+    acquire(&kmem[i].lock);
+    r = kmem[i].freelist;
+    while (r)
+    {
+      cnt++;
+      r = r->next;
+    }
+    release(&kmem[i].lock);
   }
-  release(&kmem.lock);
   return cnt * PGSIZE;
 }
 

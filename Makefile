@@ -157,6 +157,8 @@ UPROGS=\
 	$U/_lazytests\
 	$U/_cowtest\
 	$U/_uthread\
+	$U/_bcachetest\
+	$U/_kalloctest\
 	
 $U/uthread_switch.o : $U/uthread_switch.S
 	$(CC) $(CFLAGS) -c -o $U/uthread_switch.o $U/uthread_switch.S
