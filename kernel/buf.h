@@ -8,5 +8,6 @@ struct buf {
   struct buf *prev; // 最近最少使用(LRU)缓存列表
   struct buf *next;
   uchar data[BSIZE];
+  uint timestamp; // Lab lock
 };
 

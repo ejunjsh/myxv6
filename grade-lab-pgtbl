@@ -62,7 +62,7 @@ def test_count():
 def test_usertests():
     r.run_qemu(shell_script([
         'usertests'
-    ]), timeout=1000)
+    ]), timeout=2000)
 
 def usertest_check(testcase, nextcase, output):
     if not re.search(r'\ntest {}: [\s\S]*OK\ntest {}'.format(testcase, nextcase), output):

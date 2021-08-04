@@ -309,6 +309,20 @@
     time: OK 
     Score: 70/70
 
+### [File system（文件系统）](https://pdos.csail.mit.edu/6.828/2020/labs/fs.html)
+
+    $ ./grade-lab-fs
+    == Test running bigfile == running bigfile: OK (636.2s) 
+    == Test running symlinktest == (3.1s) 
+    == Test   symlinktest: symlinks == 
+    symlinktest: symlinks: OK 
+    == Test   symlinktest: concurrent symlinks == 
+    symlinktest: concurrent symlinks: OK 
+    == Test usertests == usertests: OK (1362.6s) 
+    == Test time == 
+    time: OK 
+    Score: 100/100
+
 ## 来自书的截图
 
 ![](https://github.com/ejunjsh/myxv6/raw/main/res/1.1.png)

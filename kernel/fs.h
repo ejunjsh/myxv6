@@ -22,9 +22,11 @@ struct superblock {
 
 #define FSMAGIC 0x10203040
 
-#define NDIRECT 12
+#define NDIRECT 11
 #define NINDIRECT (BSIZE / sizeof(uint))
-#define MAXFILE (NDIRECT + NINDIRECT)
+#define NININDIRECT NINDIRECT * NINDIRECT
+#define MAXFILE (NDIRECT + NINDIRECT + NININDIRECT)
+#define MAXTARGET 192
 
 // 磁盘inode结构
 struct dinode {
@@ -33,7 +35,8 @@ struct dinode {
   short minor;          // 次设备号（仅用在T_DEVICE类型）
   short nlink;          // 文件系统中到inode的链接数
   uint size;            // 文件大小（字节）
-  uint addrs[NDIRECT+1];   // 数据块地址
+  uint addrs[NDIRECT+2];   // 数据块地址
+  char target[MAXTARGET];  // 符号链接目标路径
 };
 
 // 每个块里的inode数量

@@ -28,6 +28,7 @@ int trace(int);
 int sysinfo(struct sysinfo*);
 int sigalarm(int ticks, void (*handler)());
 int sigreturn(void);
+int symlink(char *, char *);
 
 // ulib.c
 int stat(const char*, struct stat*);

@@ -159,6 +159,8 @@ UPROGS=\
 	$U/_uthread\
 	$U/_bcachetest\
 	$U/_kalloctest\
+	$U/_bigfile\
+	$U/_symlinktest\
 	
 $U/uthread_switch.o : $U/uthread_switch.S
 	$(CC) $(CFLAGS) -c -o $U/uthread_switch.o $U/uthread_switch.S

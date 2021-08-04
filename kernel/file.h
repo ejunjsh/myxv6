@@ -26,7 +26,8 @@ struct inode {
   short minor;
   short nlink;
   uint size;
-  uint addrs[NDIRECT+1];
+  uint addrs[NDIRECT+2];
+  char target[MAXTARGET];
 };
 
 // 将主设备编号映射到设备函数上。

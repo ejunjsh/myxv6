@@ -21,7 +21,7 @@
 #include "fs.h"
 #include "buf.h"
 
-#define BNUM 17
+#define BNUM 13
 
 struct {
   struct spinlock lock;
@@ -43,7 +43,7 @@ binit(void)
 
   // 创建缓冲区的链表
   for (int i = 0; i < BNUM; i++) {
-      initlock(bcache.block + i, "bcache");
+      initlock(bcache.block + i, "bcache.bucket");
       bcache.head[i].prev = &bcache.head[i];
       bcache.head[i].next = &bcache.head[i];
   }
@@ -80,11 +80,11 @@ bget(uint dev, uint blockno)
   // 未缓存。
   // 回收最近最少使用的（LRU）未使用的缓冲区。
   for (int i = (entry + 1) % BNUM; i != entry; i = (i + 1) % BNUM) {
-      struct buf *bb = 0;
+      struct buf *bb = 0; uint minticks = 0x3fffffff;
       acquire(bcache.block + i);
       for(b = bcache.head[i].prev; b != &bcache.head[i]; b = b->prev)
-          if (b->refcnt == 0) {
-              bb = b;
+          if (b->refcnt == 0 && b->timestamp < minticks) {
+              minticks = b->timestamp; bb = b;
           }
       if (bb != 0) {
           bb->dev = dev;
@@ -144,13 +144,7 @@ brelse(struct buf *b)
   acquire(bcache.block + entry);
   b->refcnt--;
   if (b->refcnt == 0) {
-    // 没有人在等它。
-    b->next->prev = b->prev;
-    b->prev->next = b->next;
-    b->next = bcache.head[entry].next;
-    b->prev = &bcache.head[entry];
-    bcache.head[entry].next->prev = b;
-    bcache.head[entry].next = b;
+    b->timestamp = ticks;
   }
   
   release(bcache.block + entry);
