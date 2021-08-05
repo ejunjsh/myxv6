@@ -3,8 +3,12 @@
 #include "memlayout.h"
 #include "riscv.h"
 #include "spinlock.h"
+#include "sleeplock.h"
 #include "proc.h"
 #include "defs.h"
+#include "fs.h"
+#include "file.h"
+#include "fcntl.h"
 
 struct cpu cpus[NCPU];
 
@@ -171,7 +175,7 @@ freeproc(struct proc *p)
     kfree((void*)p->trapframe);
   p->trapframe = 0;
   if(p->pagetable)
-    proc_freepagetable(p->pagetable, p->sz);
+    proc_freepagetable(p->pagetable, p->sz, p->mmapsz);
   p->pagetable = 0;
   if (p->kpagetable)
     proc_kfreepagetable(p->kpagetable);
@@ -184,6 +188,8 @@ freeproc(struct proc *p)
   p->killed = 0;
   p->xstate = 0;
   p->state = UNUSED;
+  p->mmapsz = 0;
+  for (int i = 0; i < 16; i++) p->vmas[i].valid = 0;
 }
 
 // 为给定进程创建用户页表，
@@ -220,10 +226,11 @@ proc_pagetable(struct proc *p)
 // 释放进程的页表，然后释放
 // 它所指的物理内存。
 void
-proc_freepagetable(pagetable_t pagetable, uint64 sz)
+proc_freepagetable(pagetable_t pagetable, uint64 sz, uint64 mmapsz)
 {
   uvmunmap(pagetable, TRAMPOLINE, 1, 0);
   uvmunmap(pagetable, TRAPFRAME, 1, 0);
+  uvmunmap(pagetable, 1L << 37, mmapsz >> PGSHIFT, 1);
   uvmfree(pagetable, sz);
 }
 
@@ -307,8 +314,18 @@ fork(void)
     return -1;
   }
 
+  if(mmapcopy(p->pagetable, np->pagetable, p->mmapsz) < 0){
+    freeproc(np);
+    release(&np->lock);
+    return -1;
+  }
 
   np->sz = p->sz;
+
+  np->mmapsz = p->mmapsz;
+  for (int i = 0; i < 16; i++) if (p->vmas[i].valid) {
+      np->vmas[i] = p->vmas[i]; filedup(np->vmas[i].fd);
+  }
 
   // 拷贝保存到用户寄存器
   *(np->trapframe) = *(p->trapframe);
@@ -702,8 +719,30 @@ uint64 nproc()
   return cnt;
 }
 
+// 处理mmap
+int handle_mmap(uint64 va,struct proc *p){
+    for (int i = 0; i < 16; i++)
+        if (p->vmas[i].valid && va >= p->vmas[i].addr && va < p->vmas[i].addr + p->vmas[i].length) {
+            int perm = PTE_U;
+            if (p->vmas[i].prot & PROT_READ) perm |= PTE_R;
+            if (p->vmas[i].prot & PROT_WRITE) perm |= PTE_W;
+            uint64 base = PGROUNDDOWN(va);
+            char *pa = kalloc(); if (pa == 0) return -1; memset(pa, 0, PGSIZE);
+            mappages(p->pagetable, base, PGSIZE, (uint64)pa, perm);
+            begin_op(); ilock(p->vmas[i].fd->ip);
+            readi(p->vmas[i].fd->ip, 1, base, base - p->vmas[i].oaddr, PGSIZE);
+            iunlock(p->vmas[i].fd->ip); end_op();
+            return 0;
+        }
+    return -1;
+}
+
 // 处理用户缺页
 int handle_pagefault(uint64 va, struct proc *p) {
+    if (va >= (1L << 37) && va <= (1L << 57)){
+      return handle_mmap(va,p);
+    }
+
     uint64 base =  PGROUNDDOWN(va);
     if (va >= p->sz) {
       return -1;

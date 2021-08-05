@@ -323,6 +323,31 @@
     time: OK 
     Score: 100/100
 
+### [mmap（内存映射）](https://pdos.csail.mit.edu/6.828/2020/labs/mmap.html)
+
+    $ ./grade-lab-mmap 
+    == Test running mmaptest == (12.3s) 
+    == Test   mmaptest: mmap f == 
+    mmaptest: mmap f: OK 
+    == Test   mmaptest: mmap private == 
+    mmaptest: mmap private: OK 
+    == Test   mmaptest: mmap read-only == 
+    mmaptest: mmap read-only: OK 
+    == Test   mmaptest: mmap read/write == 
+    mmaptest: mmap read/write: OK 
+    == Test   mmaptest: mmap dirty == 
+    mmaptest: mmap dirty: OK 
+    == Test   mmaptest: not-mapped unmap == 
+    mmaptest: not-mapped unmap: OK 
+    == Test   mmaptest: two files == 
+    mmaptest: two files: OK 
+    == Test   mmaptest: fork_test == 
+    mmaptest: fork_test: OK 
+    == Test usertests == usertests: OK (834.4s) 
+    == Test time == 
+    time: OK 
+    Score: 140/140
+
 ## 来自书的截图
 
 ![](https://github.com/ejunjsh/myxv6/raw/main/res/1.1.png)

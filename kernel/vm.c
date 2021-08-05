@@ -379,27 +379,27 @@ copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
 // 从用户复制到内核。
 // 将len字节从给定页表中的虚拟地址srcva复制到dst。
 // 成功时返回0，错误时返回-1。
-// int
-// copyin(pagetable_t pagetable, char *dst, uint64 srcva, uint64 len)
-// {
-//   uint64 n, va0, pa0;
+int
+_copyin(pagetable_t pagetable, char *dst, uint64 srcva, uint64 len)
+{
+  uint64 n, va0, pa0;
 
-//   while(len > 0){
-//     va0 = PGROUNDDOWN(srcva);
-//     pa0 = walkaddr(pagetable, va0);
-//     if(pa0 == 0)
-//       return -1;
-//     n = PGSIZE - (srcva - va0);
-//     if(n > len)
-//       n = len;
-//     memmove(dst, (void *)(pa0 + (srcva - va0)), n);
+  while(len > 0){
+    va0 = PGROUNDDOWN(srcva);
+    pa0 = walkaddr(pagetable, va0);
+    if(pa0 == 0)
+      return -1;
+    n = PGSIZE - (srcva - va0);
+    if(n > len)
+      n = len;
+    memmove(dst, (void *)(pa0 + (srcva - va0)), n);
 
-//     len -= n;
-//     dst += n;
-//     srcva = va0 + PGSIZE;
-//   }
-//   return 0;
-// }
+    len -= n;
+    dst += n;
+    srcva = va0 + PGSIZE;
+  }
+  return 0;
+}
 
 // 将以null结尾的字符串从用户复制到内核。
 // 将字节从给定页表中的虚拟地址srcva复制到dst，
@@ -447,8 +447,12 @@ copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
 int
 copyin(pagetable_t pagetable, char *dst, uint64 srcva, uint64 len)
 {
-    return copyin_new(pagetable,dst,srcva,len);
-}
+    if(srcva >= PLIC){
+      return _copyin(pagetable,dst,srcva,len);
+    } else{
+      return copyin_new(pagetable,dst,srcva,len);
+    }
+}    
 
 int
 copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
@@ -494,7 +498,7 @@ int kvmcopy(pagetable_t old, pagetable_t new, uint64 st, uint64 en) {
     uint64 pa, i;
     uint flags;
 
-    if (en > PLIC) return -1;
+    if (en >= PLIC) return -1;
 
     st = PGROUNDUP(st);
 
@@ -534,4 +538,30 @@ uint64 kvmdealloc(pagetable_t kpagetable, uint64 oldsz, uint64 newsz) {
         uvmunmap(kpagetable, PGROUNDUP(newsz), npages, 0);
     }
     return newsz;
+}
+
+int mmapcopy(pagetable_t old, pagetable_t new, uint64 sz) {
+  pte_t *pte;
+  uint64 pa, i;
+  uint flags;
+  char *mem;
+
+  for(i = 1L << 37; i < (1L << 37) + sz; i += PGSIZE) {
+    if((pte = walk(old, i, 0)) == 0) continue;
+    if((*pte & PTE_V) == 0) continue;
+    pa = PTE2PA(*pte);
+    flags = PTE_FLAGS(*pte);
+    if((mem = kalloc()) == 0)
+      goto err;
+    memmove(mem, (char*)pa, PGSIZE);
+    if(mappages(new, i, PGSIZE, (uint64)mem, flags) != 0){
+      kfree(mem);
+      goto err;
+    }
+  }
+  return 0;
+
+ err:
+  uvmunmap(new, i, (i - (1L << 37)) >> PGSHIFT, 1);
+  return -1;
 }

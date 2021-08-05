@@ -29,6 +29,8 @@ int sysinfo(struct sysinfo*);
 int sigalarm(int ticks, void (*handler)());
 int sigreturn(void);
 int symlink(char *, char *);
+void *mmap(void *addr, int length, int prot, int flags, int fd, int offset);
+int munmap(void *addr, int length);
 
 // ulib.c
 int stat(const char*, struct stat*);

@@ -509,3 +509,50 @@ uint64 sys_symlink(void) {
     iupdate(ip); iunlockput(ip);
     end_op(); return 0;
 }
+
+uint64 sys_mmap(void) {
+    int length, prot, flags; struct file *fd;
+    if (argint(1, &length) < 0 || argint(2, &prot) < 0 || argint(3, &flags) || argfd(4, 0, &fd)) return -1;
+    if (length % PGSIZE != 0 || (fd->writable == 0 && (prot & PROT_WRITE) && flags == MAP_SHARED)) return -1;
+    struct proc *p = myproc();
+    uint64 addr = (1L << 37) + p->mmapsz;
+    for (int i = 0; i < 16; i++) if (!p->vmas[i].valid) {
+        p->vmas[i].valid = 1; p->vmas[i].addr = p->vmas[i].oaddr = addr;
+        p->vmas[i].length = length; p->vmas[i].prot = prot;
+        p->vmas[i].flags = flags; p->vmas[i].fd = fd;
+        filedup(fd); p->mmapsz += length; return addr;
+    }
+    return -1;
+}
+uint64 sys_munmap(void) {
+    uint64 addr; int length;
+    if (argaddr(0, &addr) < 0 || argint(1, &length) < 0) return -1;
+    if (addr % PGSIZE != 0 || length % PGSIZE != 0) return -1;
+    struct proc *p = myproc();
+    for (int i = 0; i < 16; i++) {
+        if (p->vmas[i].valid
+            && (addr + length == p->vmas[i].addr + p->vmas[i].length
+            || addr == p->vmas[i].addr)) {
+            for (int j = 0; j < length; j += PGSIZE) {
+                if (walkaddr(p->pagetable, addr + j) == 0) continue;
+                if (p->vmas[i].flags == MAP_SHARED) {
+                    begin_op(); ilock(p->vmas[i].fd->ip);
+                    writei(p->vmas[i].fd->ip, 1, addr + j, addr + j - p->vmas[i].oaddr, PGSIZE);
+                    iunlock(p->vmas[i].fd->ip); end_op();
+                }
+                uvmunmap(p->pagetable, j + addr, 1, 1);
+            }
+            if (addr + length == p->vmas[i].addr + p->vmas[i].length)
+                p->vmas[i].length = addr - p->vmas[i].addr;
+            else {
+                p->vmas[i].addr = addr + length;
+                p->vmas[i].length -= length;
+            }
+            if (p->vmas[i].length == 0) {
+                fileclose(p->vmas[i].fd); p->vmas[i].valid = 0;
+            }
+            return 0;
+        }
+    }
+    return 0;
+}

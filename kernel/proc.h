@@ -75,6 +75,11 @@ struct trapframe {
 
 enum procstate { UNUSED, USED, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 
+struct vma {
+    uint64 addr, oaddr; int valid, length, prot, flags;
+    struct file *fd;
+};
+
 // 每个进程状态
 struct proc {
   struct spinlock lock;
@@ -105,4 +110,6 @@ struct proc {
   int duration;
   uint64 handler;
   struct trapframe state_time;
+  struct vma vmas[16];  // lab mmap
+  uint64 mmapsz;
 };

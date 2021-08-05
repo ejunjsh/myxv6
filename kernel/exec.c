@@ -119,7 +119,8 @@ exec(char *path, char **argv)
   p->sz = sz;
   p->trapframe->epc = elf.entry;  // 初始程序计数器 = main
   p->trapframe->sp = sp; // 初始堆栈指针
-  proc_freepagetable(oldpagetable, oldsz);
+  proc_freepagetable(oldpagetable, oldsz, p->mmapsz);
+  p->mmapsz = 0;
 
   // 打印init的页表 （lab pagetable）
   if(p->pid==1) vmprint(p->pagetable);
@@ -128,7 +129,7 @@ exec(char *path, char **argv)
 
  bad:
   if(pagetable)
-    proc_freepagetable(pagetable, sz);
+    proc_freepagetable(pagetable, sz, p->mmapsz);
   if(ip){
     iunlockput(ip);
     end_op();

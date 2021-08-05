@@ -90,7 +90,7 @@ int             fork(void);
 int             growproc(int);
 void            proc_mapstacks(pagetable_t);
 pagetable_t     proc_pagetable(struct proc *);
-void            proc_freepagetable(pagetable_t, uint64);
+void            proc_freepagetable(pagetable_t, uint64, uint64);
 int             kill(int);
 struct cpu*     mycpu(void);
 struct cpu*     getmycpu(void);
@@ -184,6 +184,7 @@ pagetable_t     proc_kpagetable(void);
 void            proc_kfreepagetable(pagetable_t pagetable);
 int             kvmcopy(pagetable_t, pagetable_t, uint64, uint64);
 uint64          kvmdealloc(pagetable_t, uint64, uint64);
+int             mmapcopy(pagetable_t, pagetable_t, uint64);
 
 // plic.c
 void            plicinit(void);
