@@ -20,3 +20,4 @@ xv6.out*
 ph
 *.dSYM
 barrier
+*.pcap

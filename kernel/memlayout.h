@@ -25,6 +25,8 @@
 #define VIRTIO0 0x10001000
 #define VIRTIO0_IRQ 1
 
+#define E1000_IRQ 33
+
 // 核心本地中断器（CLINT），它包含计时器。
 #define CLINT 0x2000000L
 #define CLINT_MTIMECMP(hartid) (CLINT + 0x4000 + 8*(hartid))

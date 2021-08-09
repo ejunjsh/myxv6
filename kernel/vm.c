@@ -30,6 +30,12 @@ kvmmake(void)
   // virtio mmio 磁盘接口
   kvmmap(kpgtbl, VIRTIO0, VIRTIO0, PGSIZE, PTE_R | PTE_W);
 
+  // PCI-E ECAM (configuration space), for pci.c
+  kvmmap(kpgtbl, 0x30000000L, 0x30000000L, 0x10000000, PTE_R | PTE_W);
+
+  // pci.c maps the e1000's registers here.
+  kvmmap(kpgtbl, 0x40000000L, 0x40000000L, 0x20000, PTE_R | PTE_W);
+
   // PLIC
   kvmmap(kpgtbl, PLIC, PLIC, 0x400000, PTE_R | PTE_W);
 
@@ -486,6 +492,8 @@ pagetable_t proc_kpagetable(void) {
 
     if (mappages(kpagetable, UART0, PGSIZE, UART0, PTE_R | PTE_W) != 0) return 0;
     if (mappages(kpagetable, VIRTIO0, PGSIZE, VIRTIO0, PTE_R | PTE_W) != 0) return 0;
+    if (mappages(kpagetable, 0x30000000L, 0x10000000, 0x30000000L, PTE_R | PTE_W) != 0) return 0;
+    if (mappages(kpagetable, 0x40000000L, 0x20000, 0x40000000L, PTE_R | PTE_W) != 0) return 0;
     if (mappages(kpagetable, PLIC, 0x400000, PLIC, PTE_R | PTE_W) != 0) return 0;
     if (mappages(kpagetable, KERNBASE, (uint64)etext-KERNBASE, KERNBASE, PTE_R | PTE_X) != 0) return 0;
     if (mappages(kpagetable, (uint64)etext, PHYSTOP-(uint64)etext, (uint64)etext, PTE_R | PTE_W) != 0) return 0;

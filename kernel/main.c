@@ -29,6 +29,8 @@ main()
     iinit();         // inode缓存
     fileinit();      // 文件表
     virtio_disk_init(); // 模拟硬盘
+    pci_init();      // 初始化pci
+    sockinit();      // 初始化套接字
     userinit();      // 第一个用户进程
     __sync_synchronize();
     started = 1;

@@ -348,6 +348,32 @@
     time: OK 
     Score: 140/140
 
+### [networking（网络）](https://pdos.csail.mit.edu/6.828/2020/labs/net.html)
+
+在一个窗口运行
+
+    $ make server
+    python3 server.py 25600
+    listening on localhost port 25600
+
+在另一个窗口运行
+
+    $ ./grade-lab-net
+    make: `kernel/kernel' is up to date.
+    == Test running nettests == (3.9s) 
+    == Test   nettest: ping == 
+    nettest: ping: OK 
+    == Test   nettest: single process == 
+    nettest: single process: OK 
+    == Test   nettest: multi-process == 
+    nettest: multi-process: OK 
+    == Test   nettest: DNS == 
+    nettest: DNS: OK 
+    == Test time == 
+    time: OK 
+    Score: 100/100
+    
+
 ## 来自书的截图
 
 ![](https://github.com/ejunjsh/myxv6/raw/main/res/1.1.png)
