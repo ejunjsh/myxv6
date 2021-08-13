@@ -1,5 +1,6 @@
 //
 // networking protocol support (IP, UDP, ARP, etc.).
+// 网络协议支持
 //
 
 #include "types.h"
@@ -62,6 +63,7 @@ mbuftrim(struct mbuf *m, unsigned int len)
 }
 
 // Allocates a packet buffer.
+// 分配一个包缓存
 struct mbuf *
 mbufalloc(unsigned int headroom)
 {
@@ -80,6 +82,7 @@ mbufalloc(unsigned int headroom)
 }
 
 // Frees a packet buffer.
+// 释放一个包缓存
 void
 mbuffree(struct mbuf *m)
 {
@@ -87,6 +90,7 @@ mbuffree(struct mbuf *m)
 }
 
 // Pushes an mbuf to the end of the queue.
+// 压入队列
 void
 mbufq_pushtail(struct mbufq *q, struct mbuf *m)
 {
@@ -100,6 +104,7 @@ mbufq_pushtail(struct mbufq *q, struct mbuf *m)
 }
 
 // Pops an mbuf from the start of the queue.
+// 弹出队列
 struct mbuf *
 mbufq_pophead(struct mbufq *q)
 {
@@ -111,6 +116,7 @@ mbufq_pophead(struct mbufq *q)
 }
 
 // Returns one (nonzero) if the queue is empty.
+// 如果队列为空，则返回1
 int
 mbufq_empty(struct mbufq *q)
 {
@@ -118,6 +124,7 @@ mbufq_empty(struct mbufq *q)
 }
 
 // Intializes a queue of mbufs.
+// 初始化一个mbuf队列
 void
 mbufq_init(struct mbufq *q)
 {
@@ -126,6 +133,7 @@ mbufq_init(struct mbufq *q)
 
 // This code is lifted from FreeBSD's ping.c, and is copyright by the Regents
 // of the University of California.
+// 返回摘要的，不看了，哈哈
 static unsigned short
 in_cksum(const unsigned char *addr, int len)
 {
@@ -160,6 +168,7 @@ in_cksum(const unsigned char *addr, int len)
 }
 
 // sends an ethernet packet
+// 发送一个以太包
 static void
 net_tx_eth(struct mbuf *m, uint16 ethtype)
 {
@@ -170,6 +179,8 @@ net_tx_eth(struct mbuf *m, uint16 ethtype)
   // In a real networking stack, dhost would be set to the address discovered
   // through ARP. Because we don't support enough of the ARP protocol, set it
   // to broadcast instead.
+  // 在真实的网络栈里，dhost会被设置为有ARP发现的那个地址
+  // 由于这里没有支持完整的ARP协议，所以设置为广播地址
   memmove(ethhdr->dhost, broadcast_mac, ETHADDR_LEN);
   ethhdr->type = htons(ethtype);
   if (e1000_transmit(m)) {
@@ -178,12 +189,14 @@ net_tx_eth(struct mbuf *m, uint16 ethtype)
 }
 
 // sends an IP packet
+// 发送一个IP包
 static void
 net_tx_ip(struct mbuf *m, uint8 proto, uint32 dip)
 {
   struct ip *iphdr;
 
   // push the IP header
+  // 压入IP头
   iphdr = mbufpushhdr(m, *iphdr);
   memset(iphdr, 0, sizeof(*iphdr));
   iphdr->ip_vhl = (4 << 4) | (20 >> 2);
@@ -195,10 +208,12 @@ net_tx_ip(struct mbuf *m, uint8 proto, uint32 dip)
   iphdr->ip_sum = in_cksum((unsigned char *)iphdr, sizeof(*iphdr));
 
   // now on to the ethernet layer
+  // 现在放到以太网层
   net_tx_eth(m, ETHTYPE_IP);
 }
 
 // sends a UDP packet
+// 发送UDP包
 void
 net_tx_udp(struct mbuf *m, uint32 dip,
            uint16 sport, uint16 dport)
@@ -206,17 +221,20 @@ net_tx_udp(struct mbuf *m, uint32 dip,
   struct udp *udphdr;
 
   // put the UDP header
+  // 放入UDP头
   udphdr = mbufpushhdr(m, *udphdr);
   udphdr->sport = htons(sport);
   udphdr->dport = htons(dport);
   udphdr->ulen = htons(m->len);
-  udphdr->sum = 0; // zero means no checksum is provided
+  udphdr->sum = 0; // zero means no checksum is provided 0代表不checksum了
 
   // now on to the IP layer
+  // 现在放入到IP层
   net_tx_ip(m, IPPROTO_UDP, dip);
 }
 
 // sends an ARP packet
+// 发送ARP包
 static int
 net_tx_arp(uint16 op, uint8 dmac[ETHADDR_LEN], uint32 dip)
 {
@@ -228,6 +246,7 @@ net_tx_arp(uint16 op, uint8 dmac[ETHADDR_LEN], uint32 dip)
     return -1;
 
   // generic part of ARP header
+  // ARP头的通用部分
   arphdr = mbufputhdr(m, *arphdr);
   arphdr->hrd = htons(ARP_HRD_ETHER);
   arphdr->pro = htons(ETHTYPE_IP);
@@ -242,11 +261,13 @@ net_tx_arp(uint16 op, uint8 dmac[ETHADDR_LEN], uint32 dip)
   arphdr->tip = htonl(dip);
 
   // header is ready, send the packet
+  // 头准备好了，发包
   net_tx_eth(m, ETHTYPE_ARP);
   return 0;
 }
 
 // receives an ARP packet
+// 接收ARP包
 static void
 net_rx_arp(struct mbuf *m)
 {
@@ -259,6 +280,7 @@ net_rx_arp(struct mbuf *m)
     goto done;
 
   // validate the ARP header
+  // 验证ARP头
   if (ntohs(arphdr->hrd) != ARP_HRD_ETHER ||
       ntohs(arphdr->pro) != ETHTYPE_IP ||
       arphdr->hln != ETHADDR_LEN ||
@@ -282,6 +304,7 @@ done:
 }
 
 // receives a UDP packet
+// 接收一个UDP包
 static void
 net_rx_udp(struct mbuf *m, uint16 len, struct ip *iphdr)
 {
@@ -317,6 +340,7 @@ fail:
 }
 
 // receives an IP packet
+// 接收一个IP包
 static void
 net_rx_ip(struct mbuf *m)
 {
@@ -353,6 +377,7 @@ fail:
 
 // called by e1000 driver's interrupt handler to deliver a packet to the
 // networking stack
+// 由e1000驱动中断调用，并把包递送到网络栈
 void net_rx(struct mbuf *m)
 {
   struct eth *ethhdr;

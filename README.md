@@ -46,7 +46,7 @@
 
 ## 测试
 
-   $ usertests # 进入系统后执行
+    $ usertests # 进入系统后执行, 会运行很多测试，回归测试必用
 
 ## Lab
 
@@ -54,7 +54,7 @@
 
 每个lab跑测试之前最好清空下文件
 
-    make clean
+    $ make clean
 
 ### [Utilities（工具）](https://pdos.csail.mit.edu/6.828/2020/labs/util.html)
 
@@ -372,7 +372,12 @@
     == Test time == 
     time: OK 
     Score: 100/100
-    
+
+
+## 说明
+
+* 由于内核页表和延迟加载页这两个实验，所以造成了系统调用实验里面`sysinfotest`里面测试`testmem`兼容不了了，所以我注释这部分测试
+* 由于文件系统实验引入了大文件的支持，令`usertests`执行非常慢，我机子要差不多20几分钟，如果调试可以把`writebig`这个测试注释掉
 
 ## 来自书的截图
 
