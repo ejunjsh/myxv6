@@ -94,6 +94,7 @@ timervec:
         # scratch[24] : CLINT MTIMECMP 寄存器地址.
         # scratch[32] : 中断之间的间隔.
         
+        # 保存寄存器的值
         csrrw a0, mscratch, a0
         sd a1, 0(a0)
         sd a2, 8(a0)
@@ -111,6 +112,7 @@ timervec:
 	li a1, 2
         csrw sip, a1
 
+        # 恢复寄存器的值
         ld a3, 16(a0)
         ld a2, 8(a0)
         ld a1, 0(a0)
