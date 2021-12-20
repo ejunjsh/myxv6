@@ -22,7 +22,7 @@ extern void timervec();
 void
 start()
 {
-  // 设置M之前的特权模式为内核模式，这样当mret的时候，就可以返回内核模式了
+  // 设置M之前的特权模式为管理员模式，这样当mret的时候，就可以返回管理员模式了
   unsigned long x = r_mstatus();
   x &= ~MSTATUS_MPP_MASK;
   x |= MSTATUS_MPP_S;
@@ -35,7 +35,7 @@ start()
   // 现在先禁用分页
   w_satp(0);
 
-  // 代理所有中断和异常到内核模式
+  // 代理所有中断和异常到管理员模式
   w_medeleg(0xffff);
   w_mideleg(0xffff);
   w_sie(r_sie() | SIE_SEIE | SIE_STIE | SIE_SSIE);
@@ -50,7 +50,7 @@ start()
   // allow access to all physical memory by S mode
   pmpinit();
 
-  // 转换到内核模式，并跳到main()
+  // 转换到管理员模式，并跳到main()
   asm volatile("mret");
 }
 

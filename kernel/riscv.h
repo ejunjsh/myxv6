@@ -69,12 +69,12 @@ wfi()
   asm volatile("wfi");
 }
 
-// 内核状态寄存器（Supervisor Status Register），sstatus
+// 管理员状态寄存器（Supervisor Status Register），sstatus
 
 #define SSTATUS_SPP (1L << 8)  // 之前的模式, 1=内核, 0=用户
-#define SSTATUS_SPIE (1L << 5) // 内核之前的中断启用（Supervisor Previous Interrupt Enable）
+#define SSTATUS_SPIE (1L << 5) // 管理员之前的中断启用（Supervisor Previous Interrupt Enable）
 #define SSTATUS_UPIE (1L << 4) // 用户之前的中断启用（User Previous Interrupt Enable）
-#define SSTATUS_SIE (1L << 1)  // 内核中断启用（Supervisor Interrupt Enable）
+#define SSTATUS_SIE (1L << 1)  // 管理员中断启用（Supervisor Interrupt Enable）
 #define SSTATUS_UIE (1L << 0)  // 用户中断启用（User Interrupt Enable）
 
 // 读状态
@@ -93,7 +93,7 @@ w_sstatus(uint64 x)
   asm volatile("csrw sstatus, %0" : : "r" (x));
 }
  
-// 内核中断挂起（Supervisor Interrupt Pending）
+// 管理员中断挂起（Supervisor Interrupt Pending）
 static inline uint64
 r_sip()
 {
@@ -108,7 +108,7 @@ w_sip(uint64 x)
   asm volatile("csrw sip, %0" : : "r" (x));
 }
 
-// 内核中断启用（Supervisor Interrupt Enable）
+// 管理员中断启用（Supervisor Interrupt Enable）
 #define SIE_SEIE (1L << 9) // 外部
 #define SIE_STIE (1L << 5) // 定时
 #define SIE_SSIE (1L << 1) // 软件
@@ -144,7 +144,7 @@ w_mie(uint64 x)
   asm volatile("csrw mie, %0" : : "r" (x));
 }
 
-// 内核异常程序计数器（Supervisor exception program counter），
+// 管理员异常程序计数器（Supervisor exception program counter），
 // 保存从异常返回的指令地址。
 static inline void 
 w_sepc(uint64 x)
@@ -190,7 +190,7 @@ w_mideleg(uint64 x)
   asm volatile("csrw mideleg, %0" : : "r" (x));
 }
 
-//内核陷阱矢量基地址（Supervisor Trap-Vector Base Address）
+//管理员陷阱矢量基地址（Supervisor Trap-Vector Base Address）
 //低两位是模式。？
 static inline void 
 w_stvec(uint64 x)
@@ -218,7 +218,7 @@ w_mtvec(uint64 x)
 
 #define MAKE_SATP(pagetable) (SATP_SV39 | (((uint64)pagetable) >> 12))
 
-// 内核地址翻译和保护；（supervisor address translation and protection）
+// 管理员地址翻译和保护；（supervisor address translation and protection）
 // 保存页表的地址。
 static inline void 
 w_satp(uint64 x)
@@ -234,7 +234,7 @@ r_satp()
   return x;
 }
 
-// 内核抓痕寄存器（Supervisor Scratch register）
+// 管理员抓痕寄存器（Supervisor Scratch register）
 // 主要用在早起trampoline.S里的陷阱处理
 static inline void 
 w_sscratch(uint64 x)
@@ -248,7 +248,7 @@ w_mscratch(uint64 x)
   asm volatile("csrw mscratch, %0" : : "r" (x));
 }
 
-// 内核陷阱发生原因（Supervisor Trap Cause）
+// 管理员陷阱发生原因（Supervisor Trap Cause）
 static inline uint64
 r_scause()
 {
@@ -257,7 +257,7 @@ r_scause()
   return x;
 }
 
-// 内核陷阱值（Supervisor Trap Value）
+// 管理员陷阱值（Supervisor Trap Value）
 static inline uint64
 r_stval()
 {

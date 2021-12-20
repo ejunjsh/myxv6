@@ -6,7 +6,7 @@
 
 volatile static int started = 0;
 
-// 所有cpu从start() 跳到这里，这时候就是内核模式了 
+// 所有cpu从start() 跳到这里，这时候就是管理员模式了 
 void
 main()
 {
