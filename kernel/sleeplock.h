@@ -1,4 +1,4 @@
-// 进程长期锁
+// 进程睡眠锁
 struct sleeplock {
   uint locked;       // 锁锁着吗？  
   struct spinlock lk; // spinlock保护此睡眠锁
