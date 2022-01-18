@@ -22,7 +22,7 @@ extern void timervec();
 void
 start()
 {
-  // 设置M之前的特权模式为管理员模式，这样当mret的时候，就可以返回管理员模式了
+  // 设置M(机器模式)之前的特权模式为管理员模式，这样当mret的时候，就可以返回管理员模式了
   unsigned long x = r_mstatus();
   x &= ~MSTATUS_MPP_MASK;
   x |= MSTATUS_MPP_S;
