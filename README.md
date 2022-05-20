@@ -4,6 +4,10 @@
 
 代码基于2020 MIT 6.S081的xv6-riscv，lab也基于此
 
+## 课程视频
+
+[b站中英文字幕](https://www.bilibili.com/video/BV19k4y1C7kA)
+
 ## 环境
 
 我只在macos intel x86调试，所以下面环境就是macos环境要安装的，brew自行安装吧😄
