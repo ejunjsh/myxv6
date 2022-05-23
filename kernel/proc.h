@@ -39,7 +39,7 @@ struct trapframe {
   /*   8 */ uint64 kernel_sp;     // 进程的内核栈顶
   /*  16 */ uint64 kernel_trap;   // usertrap()
   /*  24 */ uint64 epc;           // 保存用户程序计数器
-  /*  32 */ uint64 kernel_hartid; // 保存内核tp
+  /*  32 */ uint64 kernel_hartid; // 保存内核tp（在内核态，tp寄存器存的值就是cpu ID，而且一直不变，直到回到用户态，被用户态的tp覆盖，当从用户态回来，就从这这个字段恢复到tp）
   /*  40 */ uint64 ra;
   /*  48 */ uint64 sp;
   /*  56 */ uint64 gp;

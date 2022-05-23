@@ -118,7 +118,7 @@ usertrapret(void)
   p->trapframe->kernel_satp = r_satp();         // 内核页表
   p->trapframe->kernel_sp = p->kstack + PGSIZE; // 进程内核栈
   p->trapframe->kernel_trap = (uint64)usertrap;
-  p->trapframe->kernel_hartid = r_tp();         // hartid 方便cpuid()使用
+  p->trapframe->kernel_hartid = r_tp();         // 读取tp放入trapframe，这样方便用户态回到内核态时，再放回到tp，方便函数cpuid()使用
 
   // 设置寄存器好让 trampoline.S 的sret顺利回到用户空间
   
